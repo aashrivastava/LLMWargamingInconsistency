@@ -50,4 +50,4 @@ class BERTScoreEval:
 # for my purposes 
 if __name__ == '__main__':
     evaluator = BERTScoreEval()
-    print(evaluator.create_pairs(['hi i am aryan', 'hi i am ha', 'james is my friend'] * 1000, verbose=True))
+    print(evaluator.create_pairs(['test1', 'test2', 'test3'] * 1000, verbose=True))
