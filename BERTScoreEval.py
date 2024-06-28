@@ -1,6 +1,6 @@
 from bert_score import BERTScorer
 import numpy as np
-import torch
+import torch # to work with outputted tensors given by BERTScore
 # from transformers import AutoTokenizer (probably)
 import typing
 # import promptopenai so that each metric can inherit the prompting so that you don't have to call
@@ -14,7 +14,7 @@ class BERTScoreEval:
     def __init__(self, lang: str = 'en', rescale_with_baseline: bool = True) -> None:
         self.lang = lang # uses roberta-large model if lang='en'
         self.rescale_with_baseline = rescale_with_baseline
-        # self.scorer = BERTScorer(lang=self.lang, rescale_with_baseline=self.rescale_with_baseline)
+        self.scorer = BERTScorer(lang=self.lang, rescale_with_baseline=self.rescale_with_baseline)
         print('BERTScore Evaluator Initialized') # probably replace with logging
     
     def create_pairs(self, responses: list[str], verbose: bool = False) -> list[tuple[str, str]]:
