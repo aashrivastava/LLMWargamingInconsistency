@@ -1,5 +1,4 @@
 from bert_score import BERTScorer
-import numpy as np
 import torch # to work with outputted tensors given by BERTScore
 # from transformers import AutoTokenizer (probably)
 import typing
@@ -8,10 +7,10 @@ from tqdm import tqdm # progress bar
 
 class BERTScoreEval:
     '''
-    Evaluates similarity of LLM generated texts using BERTScore. Takes N sampled responses for a given query and calculates BERTScore between all combinations
+    Evaluates similarity of LLM generated texts using BERTScore. Takes N sampled responses for a given query and calculates BERTScore between all combinations 
     of pairs. Also aggregates these scores into one metric within range [0, 1]. 
     '''
-    def __init__(self, responses: list[str], lang: str = 'en', rescale_with_baseline: bool = True) -> None:
+    def __init__(self, responses: list[str], lang: str = 'en', rescale_with_baseline: bool = True):
         self.responses = responses
         self.N = len(responses)
         self.lang = lang # uses roberta-large model if lang='en'
