@@ -3,7 +3,7 @@ import torch
 from tqdm import tqdm
 from selfcheckgpt.modeling_mqag import MQAG as mqag
 
-class MQAGScoreEval:
+class MQAGEval:
     '''
     Evaluates similarity of LLM generated texts using the automatic multiple-choice question answering framework. 
     Takes N sampled responses for a given query and calculates BERTScore between all combinations of pairs. Also aggregates these scores into one metric within 
