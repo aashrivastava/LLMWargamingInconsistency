@@ -39,9 +39,9 @@ class MQAGScoreEval:
         Score questions
         '''
         score = self.model.score(candidate=cand, reference=ref, num_questions=num_questions, verbose=verbose)
-        score = score[scoring_method]
+        score = score[scoring_method] # 0 is most alike, 1 is most unalike
 
-        return 1 - score
+        return score
     
     def aggregate(self, num_questions: int=3, scoring_method: str='counting', verbose: bool=False) -> int:
         pairs = self.create_pairs(verbose=verbose)
