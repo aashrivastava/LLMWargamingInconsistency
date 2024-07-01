@@ -11,8 +11,11 @@ class MQAGEval(EvaluatorBasics):
     range [0, 1]. 
     '''
     def __init__(self, model: str='race', device: str='cuda'):
+        print('Initializing MQAG Evaluator...')
         if device == 'cuda':
             self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        else:
+            self.device = torch.device('cpu')
         self.model = mqag(g1_model_type=model, device=self.device)
         super().__init__()
 

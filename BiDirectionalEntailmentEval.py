@@ -28,7 +28,8 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
     This is initially just using Deberta model
     '''
 
-    def __init__(self, model: str='microsoft/deberta-v2-xlarge-mnli'):
+    def __init__(self, model: str='microsoft/deberta-v2-xlarge-mnli', device: str='cuda'):
+        print('Initializing BiDirectional Entailment Evaluator...')
         self.tokenizer = AutoTokenizer.from_pretrained(model)
         self.model_name = model
         if self.model_name in ['microsoft/deberta-v2-xlarge-mnli', 'microsoft/deberta-large-mnli', 'microsoft/deberta-xlarge-mnli',\
@@ -37,7 +38,12 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
         else:
             self.output_type = 'binary'
         self.model = AutoModelForSequenceClassification.from_pretrained(model)
+        if device == 'cuda':
+            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        else:
+            self.device = torch.device('cpu')
         super().__init__()
+        print('BiDirectional Entailment Evaluator initialized')
 
     def _get_probs(self, text1: str, text2: str):
         '''
