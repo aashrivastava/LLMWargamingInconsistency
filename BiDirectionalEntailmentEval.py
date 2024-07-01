@@ -1,13 +1,14 @@
 import typing
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch.nn.function
 
 class BiDirectionalEntailmentEval:
     '''
-    Score for Bi-Directional Entailment
+    Evaluates similarity of LLM generated outputs using Bi-Directional Entailment. Takes N sampled responses for a given query and calculates
+    a Bi-Directional Entailment Unalikeness that aggregates individual scores into a metric that can take on values from [0,1]
+
+    This is initially just using Deberta model
     '''
 
     def __init__(self, responses: list[str]):
-        self.responses = responses
-        self.N = len(responses)
-    
-    def aggregate(self, verbose: bool=False):
         raise NotImplementedError
