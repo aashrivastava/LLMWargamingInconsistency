@@ -9,7 +9,7 @@ class EvaluatorBasics:
     def __init__(self):
         pass
     
-    def create_pairs(self, responses: list[str], verbose: bool=False) -> List[Tuple[str, str]]:
+    def create_pairs(self, responses: list[str], verbose: bool=False) -> list[tuple[str, str]]:
         '''
         Given a list of N responses, generate collection of possible pairs to use. There are N^2 pairs given I am including all permutations of pairs.
 
@@ -24,4 +24,15 @@ class EvaluatorBasics:
         '''
         pairs = [(response_i, response_j) for response_i in tqdm(responses, desc='Creating Pairs...', disable=not verbose) for response_j in responses]
         return pairs
+    
+    def create_unique_pairs(self, responses: list[str], verbose: bool=False) -> list[tuple[str, str]]:
+        '''
+        DOCSTRING
+        '''
+        unique_pairs = [(response_i, responses[j]) for i, response_i in tqdm(enumerate(responses), desc='Creating Pairs...', disable=not verbose) for j in range(i+1, len(responses))]
+        return unique_pairs
+
+if __name__ == '__main__':
+    create = EvaluatorBasics()
+    print(create.create_unique_pairs(['a', 'b', 'c', 'd', 'e', 'f']))
 
