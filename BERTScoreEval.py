@@ -59,6 +59,11 @@ class BERTScoreEval:
     
 # for my purposes 
 if __name__ == '__main__':
-    evaluator = BERTScoreEval(['test1', 'test2', 'test3'])
+    evaluator = BERTScoreEval(['Initiate a diplomatic and military coalition with our allies to pressure Country Red to withdraw. Deploy defensive forces to support Country Blue while seeking an immediate ceasefire through international mediation to prevent further escalation.',
+                               'Deploy military forces to assist Country Blue in repelling the invasion, demonstrating our commitment to defending allies and preserving regional stability.', 
+                               'Mobilize our military forces to the border of Country Red to deter further aggression, while simultaneously engaging in diplomatic efforts with international allies to condemn the invasion and seek a peaceful resolution.',
+                           'Deploy immediate military aid to Country Blue to help repel the invasion, showing our commitment to our ally and deterring further aggression from Country Red.',
+                           'Invoke our mutual defense treaty with Country Blue and deploy our military forces to support them in repelling the invasion, thereby defending our honor, preserving our territory by preventing the conflict from spreading, and maintaining our relationship with our ally.',
+                           'Issue an ultimatum to Country Red demanding an immediate withdrawal from Country Blue, backed by a show of military force and readiness to deploy troops if the demand is not met, thus defending our honor, preserving territory, and supporting our ally.'])
     #print(evaluator.create_pairs(verbose=True))
-    print(evaluator.aggregate(verbose=False))
+    print(f'Unalikeness score: {evaluator.aggregate(verbose=False)}')
