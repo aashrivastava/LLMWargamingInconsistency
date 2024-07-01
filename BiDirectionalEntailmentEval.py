@@ -1,6 +1,8 @@
 import typing
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch.nn.functional
+from tqdm import tqdm
+import itertools
 from EvalsBase import EvaluatorBasics
 
 # _____NOTES_____
@@ -26,7 +28,7 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
     This is initially just using Deberta model
     '''
 
-    def __init__(self, model: str='MoritzLaurer/DeBERTa-v3-base-mnli-fever-docnli-ling-2c'):
+    def __init__(self, model: str='microsoft/deberta-v2-xlarge-mnli'):
         self.tokenizer = AutoTokenizer.from_pretrained(model)
         self.model_name = model
         if self.model_name in ['microsoft/deberta-v2-xlarge-mnli', 'microsoft/deberta-large-mnli', 'microsoft/deberta-xlarge-mnli',\
@@ -65,11 +67,50 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
 
         return True if torch.argmax(softmax_probs) == 0 else False
         
-    def aggregate(self, response: list[str], verbose: bool=False):
+    def aggregate(self, responses: list[str], verbose: bool=False):
         '''
         DOCSTRING
         '''
-        # implement algorithm 1 from semantic uncertainty paper
+        # implementation of algorithm 1 as described in semantic entropy paper
+        N = len(responses)
+        equivalence_classes = [[responses[0]]]
+        for response in tqdm(responses[1:], desc='Creating Equivalence Classes...', disable=not verbose):
+            found_equivalence = False
+            for c in equivalence_classes:
+                if found_equivalence:
+                    break
+                to_check = c[0]
+                if to_check == response:
+                    continue
+                if self.output_type == 'triple':
+                    if_entails1 = self.if_entails_neutral_contradict(response, to_check)
+                    if_entails2 = self.if_entails_neutral_contradict(to_check, response)
+                else:
+                    if_entails1 = self.if_entails_or_not(response, to_check)
+                    if_entails2 = self.if_entails_or_not(to_check, response)
+                if if_entails1 and if_entails2:
+                    if to_check not in equivalence_classes:
+                        c.append(response)
+                    found_equivalence = True
+            if not found_equivalence:
+                equivalence_classes.append([response])
+        print(equivalence_classes)
+
+        # aggregate the scores according to my aggregation function
+        tot = 0
+        for response_i in tqdm(responses, desc='Calculating metric...', disable=not verbose):
+            for response_j in responses:
+                if response_i == response_j:
+                    continue
+                found_c = False
+                for c in equivalence_classes:
+                    if found_c:
+                        break
+                    if response_i in c:
+                        found_c = True
+                        if response_j not in c:
+                            tot += 1
+        return tot / (N ** 2 - N)
 
 if __name__ == '__main__':
     evaluator = BiDirectionalEntailmentEval()
@@ -77,6 +118,5 @@ if __name__ == '__main__':
     contradict = 'I do not think we should go to the store'
     neutral = 'The mercedes is a good car'
     entails = 'I believe going to the store is a good idea'
-    print(evaluator.if_entails(ref, contradict))
-    print(evaluator.if_entails(ref, neutral))
-    print(evaluator.if_entails(ref, entails))
+    responses = [ref, entails, contradict, neutral]
+    print(evaluator.aggregate(responses, verbose=True))
