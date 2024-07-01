@@ -58,9 +58,12 @@ class MQAGEval(EvaluatorBasics):
         return tot / (N ** 2 - N)
     
 if __name__ == '__main__':
-    evaluator = MQAGScoreEval(['Initiate a diplomatic and military coalition with our allies to pressure Country Red to withdraw. Deploy defensive forces to support Country Blue while seeking an immediate ceasefire through international mediation to prevent further escalation.',
-                               'Deploy military forces to assist Country Blue in repelling the invasion, demonstrating our commitment to defending allies and preserving regional stability.', 
-                               'Mobilize our military forces to the border of Country Red to deter further aggression, while simultaneously engaging in diplomatic efforts with international allies to condemn the invasion and seek a peaceful resolution.'])
+    evaluator = MQAGScoreEval()
+    ref = 'I think we should go to the store'
+    contradict = 'I do not think we should go to the store'
+    neutral = 'The mercedes is a good car'
+    entails = 'I believe going to the store is a good idea'
+    responses = [ref, entails, contradict, neutral]
     print(evaluator.aggregate(verbose=True))
 
         
