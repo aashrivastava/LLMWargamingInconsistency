@@ -43,7 +43,7 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
         else:
             self.device = torch.device('cpu')
         super().__init__()
-        print('BiDirectional Entailment Evaluator initialized')
+        print(f'BiDirectional Entailment Evaluator initialized to {self.device}')
 
     def _get_probs(self, text1: str, text2: str):
         '''
