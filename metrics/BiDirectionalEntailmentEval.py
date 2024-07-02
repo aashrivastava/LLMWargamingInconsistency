@@ -30,6 +30,10 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
 
     def __init__(self, model: str='microsoft/deberta-v2-xlarge-mnli', device: str='cuda'):
         print('Initializing BiDirectional Entailment Evaluator...')
+        if device == 'cuda':
+            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        else:
+            self.device = torch.device('cpu')
         self.tokenizer = AutoTokenizer.from_pretrained(model)
         self.model_name = model
         if self.model_name in ['microsoft/deberta-v2-xlarge-mnli', 'microsoft/deberta-large-mnli', 'microsoft/deberta-xlarge-mnli',\
@@ -37,11 +41,8 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
             self.output_type = 'triple'
         else:
             self.output_type = 'binary'
-        self.model = AutoModelForSequenceClassification.from_pretrained(model)
-        if device == 'cuda':
-            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        else:
-            self.device = torch.device('cpu')
+        self.model = AutoModelForSequenceClassification.from_pretrained(model).to(self.device)
+
         super().__init__()
         print(f'BiDirectional Entailment Evaluator initialized to {self.device}')
 
@@ -49,7 +50,7 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
         '''
         DOCSTRING
         '''
-        inputs = self.tokenizer(text1, text2, return_tensors='pt')
+        inputs = self.tokenizer(text1, text2, return_tensors='pt').to(self.device)
         outputs = self.model(**inputs)
         logits = outputs.logits
 
@@ -100,7 +101,7 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
                     found_equivalence = True
             if not found_equivalence:
                 equivalence_classes.append([response])
-        print(equivalence_classes)
+        # print(equivalence_classes)
 
         # aggregate the scores according to my aggregation function
         tot = 0

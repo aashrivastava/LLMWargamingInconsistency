@@ -68,4 +68,3 @@ if __name__ == '__main__':
     responses = [ref, entails, contradict, neutral]
     print(evaluator.aggregate(verbose=True))
 
-    
