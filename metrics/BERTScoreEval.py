@@ -4,7 +4,7 @@ import torch # to work with outputted tensors given by BERTScore
 import typing
 # import promptopenai so that each metric can inherit the prompting so that you don't have to call
 from tqdm import tqdm # progress bar
-from EvalsBase import EvaluatorBasics
+from utils.EvalsBase import EvaluatorBasics
 
 class BERTScoreEval(EvaluatorBasics):
     '''

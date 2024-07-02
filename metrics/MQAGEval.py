@@ -2,7 +2,9 @@ import typing
 import torch
 from tqdm import tqdm
 from selfcheckgpt.modeling_mqag import MQAG as mqag
-from EvalsBase import EvaluatorBasics
+from utils.EvalsBase import EvaluatorBasics 
+# if getting module not found error for above line, set an environment variable called PYTHONPATH to the ABSOLUTE path to LLMWargamingConfidence
+# ie $ export PYTHONPATH='PathToLLMWargamingConfidence'
 
 class MQAGEval(EvaluatorBasics):
     '''
@@ -66,5 +68,4 @@ if __name__ == '__main__':
     responses = [ref, entails, contradict, neutral]
     print(evaluator.aggregate(verbose=True))
 
-        
-        
+    

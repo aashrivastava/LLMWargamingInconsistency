@@ -3,7 +3,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch.nn.functional
 from tqdm import tqdm
 import itertools
-from EvalsBase import EvaluatorBasics
+from utils.EvalsBase import EvaluatorBasics
 
 # _____NOTES_____
 # microsoft/deberta-v2-xlarge-mnli 
@@ -125,4 +125,6 @@ if __name__ == '__main__':
     neutral = 'The mercedes is a good car'
     entails = 'I believe going to the store is a good idea'
     responses = [ref, entails, contradict, neutral]
-    print(evaluator.aggregate(responses, verbose=True))
+
+    score = evaluator.aggregate(responses, verbose=True)
+    print(f'The unalikeness metric is: {score: .2f}')
