@@ -7,6 +7,13 @@ from tqdm import tqdm # progress bar
 from utils.EvalsBase import EvaluatorBasics
 from utils.promptopenai import OpenAIPrompting
 
+## WHAT TO DO FOR LATER/TOMORROW
+## ___PRESSING___
+# connect promptopenai to these
+# confirm that my aggregation is reasonable
+## ___NICE TO HAVE___
+# get a baseline for texts
+
 class BERTScoreEval(EvaluatorBasics):
     '''
     Evaluates similarity of LLM generated texts using BERTScore. Takes N sampled responses for a given query and calculates BERTScore between all combinations 

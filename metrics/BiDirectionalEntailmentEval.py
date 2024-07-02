@@ -5,6 +5,13 @@ from tqdm import tqdm
 import itertools
 from utils.EvalsBase import EvaluatorBasics
 
+## WHAT TO DO FOR LATER/TOMORROW
+## ___PRESSING___
+# connect promptopenai to these
+# confirm that my aggregation is reasonable
+## ___NICE TO HAVE___
+# get a baseline for texts
+
 # _____NOTES_____
 # microsoft/deberta-v2-xlarge-mnli 
 #   - idx 0 is contradict, idx 1 is neutral, idx 2 is entails

@@ -6,6 +6,14 @@ from utils.EvalsBase import EvaluatorBasics
 # if getting module not found error for above line, set an environment variable called PYTHONPATH to the ABSOLUTE path to LLMWargamingConfidence
 # ie $ export PYTHONPATH='PathToLLMWargamingConfidence'
 
+## WHAT TO DO FOR LATER/TOMORROW
+## ___PRESSING___
+# connect promptopenai to these
+# confirm that my aggregation is reasonable
+# figure out how I can run this with compute
+## ___NICE TO HAVE___
+# get a baseline for texts
+
 class MQAGEval(EvaluatorBasics):
     '''
     Evaluates similarity of LLM generated texts using the automatic multiple-choice question answering framework. 

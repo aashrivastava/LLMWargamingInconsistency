@@ -3,6 +3,11 @@ import os
 import typing
 # from tqdm import tqdm
 
+## WHAT TO DO FOR LATER/TOMORROW
+## ___PRESSING___
+# figure out how to use this
+## ___NICE TO HAVE___
+
 # key = os.environ.get("OPENAI_API_KEY")
 # org = os.environ.get('OPENAI_ORG_KEY')
 

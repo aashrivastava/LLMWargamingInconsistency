@@ -2,6 +2,12 @@ import typing
 import numpy as np
 from tqdm import tqdm
 
+## WHAT TO DO FOR LATER/TOMORROW
+## ___PRESSING___
+# connect promptopenai to this so I can just generate the responses list in proper format
+## ___NICE TO HAVE___
+
+
 class EvaluatorBasics:
     '''
     basic functions that each evaluator can use
