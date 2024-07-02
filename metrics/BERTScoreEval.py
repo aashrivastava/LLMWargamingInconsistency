@@ -5,6 +5,7 @@ import typing
 # import promptopenai so that each metric can inherit the prompting so that you don't have to call
 from tqdm import tqdm # progress bar
 from utils.EvalsBase import EvaluatorBasics
+from utils.promptopenai import OpenAIPrompting
 
 class BERTScoreEval(EvaluatorBasics):
     '''

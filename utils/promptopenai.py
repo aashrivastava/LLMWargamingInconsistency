@@ -1,10 +1,10 @@
 import openai as oai
 import os
 import typing
-from tqdm import tqdm
+# from tqdm import tqdm
 
-key = os.environ.get("OPENAI_API_KEY")
-org = os.environ.get('OPENAI_ORG_KEY')
+# key = os.environ.get("OPENAI_API_KEY")
+# org = os.environ.get('OPENAI_ORG_KEY')
 
 # ___MODELS TO USE___
 # GPT-4
@@ -35,13 +35,26 @@ class OpenAIPrompting:
     '''
     Prompt OpenAI and get responses.
     '''
-    def __init__(self, model: str = 'gpt-3.5-turbo'):
+    def __init__(self, model: str):
         self.model = model
         self.n_responses = n_responses
-        self.client = OpenAI()
+        self.client = OpenAI(
+            organization=os.environ.get('OPENAI_ORG_KEY')
+        )
     
-    def get_completions(self, prompt, N_responses: int=20):
+    # def _completions(self, **kwargs):
+    #     '''
+    #     IMPLEMENT DOCSTRING
+    #     '''
+    #     completion = client.chat.completions.create(
+    #         **kwargs
+    #     )
+    #     return completion
+    
+    def get_ChatCompletions(self, prompt: dict[str, str], N_responses: int=20, temperature: int=1.0):
         '''
+        ## TODO:
+        ##  Implement **kwargs so that user can pass other things if they want beyond these explicit ones
         Given a prompt, get n_responses chat completions 
 
         Inputs:
@@ -50,22 +63,12 @@ class OpenAIPrompting:
             N_responses (int):
                 This specifies how many completions I want for a given query
         '''
-        
-
-
-# ______EXAMPLE COMPLETION WITH OPENAI API_______
-# client = oai.OpenAI(organization=org)
-
-# completion = client.chat.completions.create(
-#   model="gpt-3.5-turbo",
-#   messages=[
-#     {"role": "system", "content": "You are a poetic assistant, skilled in explaining complex programming concepts with creative flair."},
-#     {"role": "user", "content": "Compose a poem that explains the concept of recursion in programming."}
-#   ]
-# )
-
-# print(completion.choices[0].message)
-
-    
-
-    
+        return self.client.chat.completions.create(
+            model = self.model,
+            messages = [
+                {'role': 'system', 'content': prompt['system']},
+                {'role': 'user', 'content': prompt['user']}
+            ],
+            n = N_responses,
+            temperature = temperature,
+        )

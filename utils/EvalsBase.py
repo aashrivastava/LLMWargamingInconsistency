@@ -25,7 +25,7 @@ class EvaluatorBasics:
         pairs = [(response_i, response_j) for response_i in tqdm(responses, desc='Creating Pairs...', disable=not verbose) for response_j in responses]
         return pairs
     
-    def create_unique_pairs(self, responses: list[str], verbose: bool=False) -> list[tuple[str, str]]:
+    def create_unique_pairs(self, responses: list[str] or list[dict[str, int]], verbose: bool=False) -> list[tuple[str, str]]:
         '''
         DOCSTRING
         '''
