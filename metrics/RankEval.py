@@ -11,7 +11,7 @@ class RankEval(EvaluatorBasics):
         self.method = method
         super().__init__()
     
-    def kendalls_tau(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False):
+    def _kendalls_tau(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False):
         '''
         IMPLEMENT DOCSTRING
         '''
@@ -52,8 +52,39 @@ class RankEval(EvaluatorBasics):
         '''
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         N = len(responses)
+        
+        # aggregator according to formula seen in paper
         tot = 0
+        for r1, r2 in tqdm(pairs, desc='Calculating RankEval using Kendall\'s Tau...', disable=not verbose):
+            tot += (1 - self.kendalls_tau(r1, r2, verbose=verbose))
+        
+        return tot / math.comb(N, 2)
         # get pairs and think about how to aggregate
+    
+    def _spearmans_coef(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False):
+        '''
+        IMPLEMENT DOCSTRING
+        '''
+        assert len(rank1) == len(rank2)
+        assert rank1.keys() == rank2.keys()
+
+        categories = list(rank1.keys())
+        n = len(categories)
+
+        sum_diffs = 0
+        for cat in categories:
+            sum_diffs += (rank1[cat] - rank2[cat])**2
+        
+        return (2 - ((6 * sum_diffs)/(n*(n**2 - 1))))/2
         
         
+if __name__ == '__main__':
+    opp = {'a': 4, 'b': 3, 'c': 2, 'd': 1}
+    rankings = [
+        {'a': 1, 'b': 2, 'c': 3, 'd': 4},
+        opp,
+    ]
+
+    evaluator = RankEval()
+    print(evaluator._spearmans_coef(rankings[0], rankings[1], verbose=True))
 
