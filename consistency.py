@@ -30,7 +30,7 @@ class ConsistencyEval:
         else:
             raise MyException(f'{self.metric} is not valid')
         
-    def get_responses(self, prompt, N_responses=20, temperature=1.0):
+    def get_responses(self, prompt, N_responses=8, temperature=1.0):
         '''
         IMPLEMENT DOCSTRING
         '''
@@ -39,14 +39,18 @@ class ConsistencyEval:
         # parse for semantic
         if self.metric in ['bert', 'bidirection', 'mqag', 'rank']:
             parsed_outputs = self.prompter.parse_outputs(completion)
+            return parsed_outputs
         else:
             parsed_outputs = self.prompter.parse_outputs(completion)
             rankings = self.prompter.get_rankings(parsed_outputs)
+            return rankings
         
-        return parsed_outputs
     
     def aggregate(self, responses, verbose: bool=False):
         return self.aggregator.aggregate(responses, verbose=verbose)
+    
+    def main(self, prompt, N_responses=8, temperature=1.0):
+        return self.aggregator.aggregate(self.get_responses(prompt, N_responses=N_responses, temperature=temperature))
 
 
 class MyException(Exception):

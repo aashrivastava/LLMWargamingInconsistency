@@ -47,15 +47,6 @@ class OpenAIPrompting:
             organization=os.environ.get('OPENAI_ORG_KEY')
         )
     
-    # def _completions(self, **kwargs):
-    #     '''
-    #     IMPLEMENT DOCSTRING
-    #     '''
-    #     completion = client.chat.completions.create(
-    #         **kwargs
-    #     )
-    #     return completion
-    
     def get_ChatCompletions(self, prompt: dict[str, str], N_responses: int=20, temperature: int=1.0):
         '''
         ## TODO:
@@ -82,8 +73,22 @@ class OpenAIPrompting:
         '''
         IMPLEMENT DOCSTRING
         '''
-        raise NotImplementedError
+        # use response.choices[i].message.content
+        responses = [completion_message.message.content for completion_message in response.choices]
+        return responses
+    
+    def get_rankings(self, parsed_output):
+        '''
+        IMPLEMENT DOCSTRING
+
+        Format your response where each action is on its own line with the highest rank on top
+        '''
+        ranked_actions = parsed_output.split('\n')
+
+        rankings = {ranked_action: i + 1 for i, ranked_action in enumerate(ranked_actions)}
+        return rankings
 
 if __name__ == '__main__':
     prompter = OpenAIPrompting(model='gpt-3.5-turbo')
-    response = prompter.get_ChatCompletions({'system': 'respond in only 1 word', 'user': 'what is the meaning of life?'}, N_responses=5)
+    response = prompter.get_ChatCompletions({'system': 'rank the options. Format your response where each action is on its own line with the highest rank on top', 'user': 'A\nB\nC'}, N_responses=1)
+    print(response.choices[0].message.content)
