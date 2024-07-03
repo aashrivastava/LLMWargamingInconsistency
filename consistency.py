@@ -11,24 +11,24 @@ class ConsistencyEval:
     '''
     DOCSTRING
     '''
-    def __init__(self, prompting_model, method, **kwargs):
+    def __init__(self, prompting_model, metric, **kwargs):
         '''
-        **kwargs is keyword arguments pertaining to particular consistency method
+        **kwargs is keyword arguments pertaining to particular consistency metric
         '''
-        assert method in ['bert', 'bidirection', 'mqag', 'rank']
+        assert metric in ['bert', 'bidirection', 'mqag', 'rank']
         # assertion that given model is valid
         self.prompter = OpenAIPrompting(model=prompting_model)
-        self.method = method
-        if method == 'bert':
+        self.metric = metric
+        if self.metric == 'bert':
             self.aggregator = BERTScoreEval(**kwargs)
-        elif method == 'bidirection':
+        elif self.metric == 'bidirection':
             self.aggregator = BiDirectionalEntailmentEval(**kwargs)
-        elif method == 'mqag':
+        elif self.metric == 'mqag':
             self.aggregator = MQAGEval(**kwargs)
-        elif method == 'rank':
-            self.aggregator = RankEval()
+        elif self.metric == 'rank':
+            self.aggregator = RankEval(**kwargs)
         else:
-            raise MyException(f'{method} is not valid')
+            raise MyException(f'{self.metric} is not valid')
         
     def get_responses(self, prompt, N_responses=20, temperature=1.0):
         '''
@@ -37,7 +37,7 @@ class ConsistencyEval:
         completion = self.prompter.get_ChatCompletions(prompt, 
                             N_responses=N_responses)
         # parse for semantic
-        if self.method in ['bert', 'bidirection', 'mqag', 'rank']:
+        if self.metric in ['bert', 'bidirection', 'mqag', 'rank']:
             parsed_outputs = self.prompter.parse_outputs(completion)
         else:
             parsed_outputs = self.prompter.parse_outputs(completion)

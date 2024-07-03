@@ -15,7 +15,8 @@ class RankEval(EvaluatorBasics):
     '''
     IMPLEMENT DOCSTRING
     '''
-    def __init__(self):
+    def __init__(self, method: str='kendall'):
+        self.method = method
         super().__init__()
     
     def make_assertions(self, rank1: dict[str, int], rank2: dict[str, int]):
@@ -128,14 +129,14 @@ class RankEval(EvaluatorBasics):
         
         return tot / math.comb(N, 2)
     
-    def aggregate(self, responses, method: str='kendall', verbose: bool=False):
+    def aggregate(self, responses, verbose: bool=False):
         assert len(responses) >= 2
 
-        if method == 'kendall':
+        if self.method == 'kendall':
             return self._aggregate_kendalls(responses, verbose=verbose)
-        elif method == 'spearman':
+        elif self.method == 'spearman':
             return self._aggregate_spearmans(responses, verbose=verbose)
-        elif method == 'hamming':
+        elif self.method == 'hamming':
             return self._aggregate_hamming(responses, verbose=verbose)
         
 if __name__ == '__main__':
