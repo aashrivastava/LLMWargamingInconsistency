@@ -21,8 +21,10 @@ class MQAGEval(EvaluatorBasics):
     Takes N sampled responses for a given query and calculates BERTScore between all combinations of pairs. Also aggregates these scores into one metric within 
     range [0, 1]. 
     '''
-    def __init__(self, model: str='race', device: str='cuda'):
+    def __init__(self, model: str='race', device: str='cuda', num_questions: int=3, scoring_method: str='counting'):
         print('Initializing MQAG Evaluator...')
+        self.num_questions = num_questions
+        self.scoring_method = scoring_method
         if device == 'cuda':
             self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         else:
@@ -32,31 +34,17 @@ class MQAGEval(EvaluatorBasics):
 
         print(f'MQAGScoreEval initialized to {self.device}')
     
-    def create_pairs(self, responses: list[str], verbose: bool = False) -> list[tuple[str, str]]:
-        '''
-        Given a list of N responses, generate collection of possible pairs to use. There are N^2 pairs given I am including all permutations of pairs.
 
-        Inputs:
-            verbose: bool
-                Indicates whether you want progress bar to show
-        
-        Outputs:
-            List[Tuple[str, str]]: List (length N^2) of pairs
-        '''
-        pairs = [(response_i, response_j) for response_i in tqdm(responses, desc='Creating Pairs...', disable=not verbose) for response_j in responses]
-        return pairs
-    
-    def score_questions(self, cand: str, ref: str, 
-                        num_questions: int=3, scoring_method: str='counting', verbose: bool=False) -> int:
+    def score_questions(self, cand: str, ref: str, verbose: bool=False) -> int:
         '''
         IMPLEMENT DOCSTRING
         '''
-        score = self.model.score(candidate=cand, reference=ref, num_questions=num_questions, verbose=verbose)
-        score = score[scoring_method] # 0 is most alike, 1 is most unalike
+        score = self.model.score(candidate=cand, reference=ref, num_questions=self.num_questions, verbose=verbose)
+        score = score[self.scoring_method] # 0 is most alike, 1 is most unalike
 
         return score
     
-    def aggregate(self, responses: list[str], num_questions: int=3, scoring_method: str='counting', verbose: bool=False) -> int:
+    def aggregate(self, responses: list[str], verbose: bool=False) -> int:
         '''
         IMPLEMENT DOCSTRING
         '''
@@ -64,7 +52,7 @@ class MQAGEval(EvaluatorBasics):
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         tot = 0
         for t1, t2 in tqdm(pairs, desc='Calculating MQAGEval...', disable=not verbose):
-            tot += self.score_questions(t1, t2, num_questions=num_questions, scoring_method=scoring_method, verbose=verbose)
+            tot += self.score_questions(t1, t2, num_questions=self.num_questions, scoring_method=scoring_method, verbose=verbose)
         
         return tot / math.comb(N, 2)
     
