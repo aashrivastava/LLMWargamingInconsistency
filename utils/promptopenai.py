@@ -75,6 +75,7 @@ class OpenAIPrompting:
         '''
         # use response.choices[i].message.content
         responses = [completion_message.message.content for completion_message in response.choices]
+        # print(responses)
         return responses
     
     def get_rankings(self, parsed_output):
