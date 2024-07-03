@@ -50,7 +50,7 @@ class BERTScoreEval(EvaluatorBasics):
         # pairs = self.create_pairs(responses, verbose=verbose)
         unique_pairs = self.create_unique_pairs(responses, verbose=verbose)
         tot = 0
-        for t1, t2 in tqdm(pairs, desc='Calculating BERTEval...', disable=not verbose):
+        for t1, t2 in tqdm(unique_pairs, desc='Calculating BERTEval...', disable=not verbose):
             P, R, F1 = self.scorer.score([t1], [t2])
             # print(f'added for {t1} AND {t2}: {1 - F1.item()}')
 

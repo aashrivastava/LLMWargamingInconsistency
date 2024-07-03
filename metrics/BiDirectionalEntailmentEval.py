@@ -94,8 +94,8 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
                 if found_equivalence:
                     break
                 to_check = c[0]
-                if to_check == response:
-                    continue
+                # if to_check == response:
+                #     continue
                 if self.output_type == 'triple':
                     if_entails1 = self.if_entails_neutral_contradict(response, to_check)
                     if_entails2 = self.if_entails_neutral_contradict(to_check, response)
@@ -125,10 +125,13 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
         #                 if response_j not in c:
         #                     tot += 1
         # return tot / (N ** 2 - N)
+        # aggregate according to formula given in paper
         tot = 0
         for c in equivalence_classes:
             for response in c:
-                pass
+                tot += (N - len(c))
+        
+        return tot / (N ** 2 - N)
 
 if __name__ == '__main__':
     evaluator = BiDirectionalEntailmentEval(model='potsawee/deberta-v3-large-mnli')
