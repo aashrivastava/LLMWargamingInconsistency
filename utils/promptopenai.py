@@ -42,8 +42,8 @@ class OpenAIPrompting:
     '''
     def __init__(self, model: str):
         self.model = model
-        self.n_responses = n_responses
-        self.client = OpenAI(
+        # self.n_responses = n_responses
+        self.client = oai.OpenAI(
             organization=os.environ.get('OPENAI_ORG_KEY')
         )
     
@@ -77,3 +77,13 @@ class OpenAIPrompting:
             n = N_responses,
             temperature = temperature,
         )
+    
+    def parse_outputs(self, response):
+        '''
+        IMPLEMENT DOCSTRING
+        '''
+        raise NotImplementedError
+
+if __name__ == '__main__':
+    prompter = OpenAIPrompting(model='gpt-3.5-turbo')
+    response = prompter.get_ChatCompletions({'system': 'respond in only 1 word', 'user': 'what is the meaning of life?'}, N_responses=5)

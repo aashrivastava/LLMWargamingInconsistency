@@ -3,6 +3,7 @@ import torch
 from tqdm import tqdm
 from selfcheckgpt.modeling_mqag import MQAG as mqag
 from utils.EvalsBase import EvaluatorBasics 
+import math
 # if getting module not found error for above line, set an environment variable called PYTHONPATH to the ABSOLUTE path to LLMWargamingConfidence
 # ie $ export PYTHONPATH='PathToLLMWargamingConfidence'
 
@@ -60,12 +61,12 @@ class MQAGEval(EvaluatorBasics):
         IMPLEMENT DOCSTRING
         '''
         N = len(responses)
-        pairs = self.create_pairs(responses, verbose=verbose)
+        pairs = self.create_unique_pairs(responses, verbose=verbose)
         tot = 0
         for t1, t2 in tqdm(pairs, desc='Calculating MQAGEval...', disable=not verbose):
             tot += self.score_questions(t1, t2, num_questions=num_questions, scoring_method=scoring_method, verbose=verbose)
         
-        return tot / (N ** 2 - N)
+        return tot / math.comb(N, 2)
     
 if __name__ == '__main__':
     evaluator = MQAGScoreEval()

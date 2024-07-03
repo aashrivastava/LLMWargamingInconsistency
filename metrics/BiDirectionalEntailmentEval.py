@@ -108,31 +108,36 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
                     found_equivalence = True
             if not found_equivalence:
                 equivalence_classes.append([response])
-        # print(equivalence_classes)
+        print(equivalence_classes)
 
         # aggregate the scores according to my aggregation function
+        # tot = 0
+        # for i, response_i in tqdm(enumerate(responses), desc='Calculating metric...', disable=not verbose):
+        #     for j, response_j in enumerate(responses):
+        #         # if i == j:
+        #         #     continue
+        #         found_c = False
+        #         for c in equivalence_classes:
+        #             if found_c:
+        #                 break
+        #             if response_i in c:
+        #                 found_c = True
+        #                 if response_j not in c:
+        #                     tot += 1
+        # return tot / (N ** 2 - N)
         tot = 0
-        for response_i in tqdm(responses, desc='Calculating metric...', disable=not verbose):
-            for response_j in responses:
-                if response_i == response_j:
-                    continue
-                found_c = False
-                for c in equivalence_classes:
-                    if found_c:
-                        break
-                    if response_i in c:
-                        found_c = True
-                        if response_j not in c:
-                            tot += 1
-        return tot / (N ** 2 - N)
+        for c in equivalence_classes:
+            for response in c:
+                pass
 
 if __name__ == '__main__':
-    evaluator = BiDirectionalEntailmentEval()
+    evaluator = BiDirectionalEntailmentEval(model='potsawee/deberta-v3-large-mnli')
     ref = 'I think we should go to the store'
     contradict = 'I do not think we should go to the store'
     neutral = 'The mercedes is a good car'
     entails = 'I believe going to the store is a good idea'
     responses = [ref, entails, contradict, neutral]
+    responses = ['Love.', 'love', 'unknown', 'Experience', 'Experience']
 
     score = evaluator.aggregate(responses, verbose=True)
     print(f'The unalikeness metric is: {score: .2f}')

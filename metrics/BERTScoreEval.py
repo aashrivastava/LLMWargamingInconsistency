@@ -6,6 +6,7 @@ import typing
 from tqdm import tqdm # progress bar
 from utils.EvalsBase import EvaluatorBasics
 from utils.promptopenai import OpenAIPrompting
+import math
 
 ## WHAT TO DO FOR LATER/TOMORROW
 ## ___PRESSING___
@@ -46,14 +47,17 @@ class BERTScoreEval(EvaluatorBasics):
             int: "unalikeness" metric using BERTScore
         '''
         N = len(responses)
-        pairs = self.create_pairs(responses, verbose=verbose)
+        # pairs = self.create_pairs(responses, verbose=verbose)
+        unique_pairs = self.create_unique_pairs(responses, verbose=verbose)
         tot = 0
         for t1, t2 in tqdm(pairs, desc='Calculating BERTEval...', disable=not verbose):
-            #print(t1, t2)
             P, R, F1 = self.scorer.score([t1], [t2])
+            # print(f'added for {t1} AND {t2}: {1 - F1.item()}')
+
             tot += (1 - F1.item()) 
         
-        return tot / (N**2 - N)
+        # return tot / (N**2 - N)
+        return tot / math.comb(N, 2)
     
 # for my purposes 
 if __name__ == '__main__':
@@ -63,5 +67,5 @@ if __name__ == '__main__':
     neutral = 'The mercedes is a good car'
     entails = 'I believe going to the store is a good idea'
     responses = [ref, entails, contradict, neutral]
-    #print(evaluator.create_pairs(verbose=True))
-    print(f'Unalikeness score: {evaluator.aggregate(responses, verbose=True)}')
+    # responses =['Love.', 'love', 'unknown', 'Experience', 'Experience']
+    print(f'Unalikeness score: {evaluator.aggregate(responses, verbose=False)}')
