@@ -42,6 +42,8 @@ class BERTScoreEval(EvaluatorBasics):
         Inputs:
             responses: list[str]
                 list of responses that LLM generates to given query
+            verbose: bool
+                represents whether you want to visualize progress
         
         Outputs:
             int: "unalikeness" metric using BERTScore
@@ -52,7 +54,8 @@ class BERTScoreEval(EvaluatorBasics):
         tot = 0
         for t1, t2 in tqdm(unique_pairs, desc='Calculating BERTEval...', disable=not verbose):
             P, R, F1 = self.scorer.score([t1], [t2])
-            # print(f'added for {t1} AND {t2}: {1 - F1.item()}')
+            if verbose:
+                print(f'BERTScore between {t1} AND {t2}: {F1.item()}')
 
             tot += (1 - F1.item()) 
         
@@ -69,3 +72,5 @@ if __name__ == '__main__':
     responses = [ref, entails, contradict, neutral]
     # responses =['Love.', 'love', 'unknown', 'Experience', 'Experience']
     print(f'Unalikeness score: {evaluator.aggregate(responses, verbose=False)}')
+
+    

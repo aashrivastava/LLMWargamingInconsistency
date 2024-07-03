@@ -5,11 +5,9 @@ import typing
 
 ## WHAT TO DO FOR LATER/TOMORROW
 ## ___PRESSING___
-# figure out how to use this
+# WRITE PROMPTS TO TXT FILE
+# THINK ABOUT PROMPT FORMAT AND OUTPUT FORMAT (AND HOW TO ELICIT IT)
 ## ___NICE TO HAVE___
-
-# key = os.environ.get("OPENAI_API_KEY")
-# org = os.environ.get('OPENAI_ORG_KEY')
 
 # ___MODELS TO USE___
 # GPT-4
@@ -38,7 +36,7 @@ davinci-002: Replacement for the GPT-3 curie and davinci base models.	16,384 tok
 
 class OpenAIPrompting:
     '''
-    Prompt OpenAI and get responses.
+    Prompt OpenAI and get responses. Also write to .txt files (TO IMPLEMENT) and parse into workable data structures
     '''
     def __init__(self, model: str):
         self.model = model
@@ -58,6 +56,8 @@ class OpenAIPrompting:
                 This is a json file with system and user messages. # TBD
             N_responses (int):
                 This specifies how many completions I want for a given query
+        Output:
+            Chat completion given by openai api based on prompt and hyperparameters
         '''
         return self.client.chat.completions.create(
             model = self.model,
@@ -69,20 +69,35 @@ class OpenAIPrompting:
             temperature = temperature,
         )
     
-    def parse_outputs(self, response):
+    def parse_outputs(self, response) -> list[str]:
         '''
-        IMPLEMENT DOCSTRING
+        Get list of strings which is just the text outputs of the chat completions given by openai api
+
+        Inputs:
+            response:
+                Response given by openai api
+        
+        Output:
+            list[str]: list of strings where each string is one text output of openai
         '''
         # use response.choices[i].message.content
         responses = [completion_message.message.content for completion_message in response.choices]
         # print(responses)
+
+
         return responses
     
-    def get_rankings(self, parsed_output):
+    def get_rankings(self, parsed_output: list[str]) -> dict[str, int]:
         '''
-        IMPLEMENT DOCSTRING
+        Get dictionary where keys are action and int is the ranking of that action from chatcompletion given by
+        openai api.
 
-        Format your response where each action is on its own line with the highest rank on top
+        Inputs:
+            parsed_output: list[str]
+                list of strings which is just the text outputs of the chat completions given by openai api
+        Output:
+            dict[str, int]: dictionary where keys are action and int is the ranking of that action from chatcompletion given by
+                            openai api.
         '''
         ranked_actions = parsed_output.split('\n')
 

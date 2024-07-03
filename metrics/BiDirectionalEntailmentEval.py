@@ -1,5 +1,6 @@
 import typing
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
 import torch.nn.functional
 from tqdm import tqdm
 import itertools
@@ -31,8 +32,6 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
     '''
     Evaluates similarity of LLM generated outputs using Bi-Directional Entailment. Takes N sampled responses for a given query and calculates
     a Bi-Directional Entailment Unalikeness that aggregates individual scores into a metric that can take on values from [0,1]
-
-    This is initially just using Deberta model
     '''
 
     def __init__(self, model: str='microsoft/deberta-v2-xlarge-mnli', device: str='cuda'):
@@ -53,9 +52,18 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
         super().__init__()
         print(f'BiDirectional Entailment Evaluator initialized to {self.device}')
 
-    def _get_probs(self, text1: str, text2: str):
+    def _get_probs(self, text1: str, text2: str) -> torch.Tensor:
         '''
-        DOCSTRING
+        Get probabilities that text2 is {entailed by, is neutral to, contradicts} text 1
+
+        Inputs:
+            text1: str
+                Does text1 entail text2?
+            text2: str
+                Does text1 entail text2?
+        
+        Output: 
+
         '''
         inputs = self.tokenizer(text1, text2, return_tensors='pt').to(self.device)
         outputs = self.model(**inputs)
@@ -67,7 +75,17 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
     
     def if_entails_neutral_contradict(self, text1: str, text2: str) -> bool:
         '''
-        DOCSTRING
+        This is used for models where you have probs for entailment, neutral, contradiction.
+        Checks whether entailment has the maximum softmax probability
+
+        Inputs:
+            text1: str
+                Does text1 entail text2?
+            text2: str
+                Does text1 entail text2?
+        
+        Output:
+            bool: indication of whether text1 entails text2
         '''
         softmax_probs = self._get_probs(text1, text2)
 
@@ -75,7 +93,17 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
     
     def if_entails_or_not(self, text1: str, text2: str) -> bool:
         '''
-        DOCSTRING
+        This is used for models where you have probs for entailment, contradiction, without a neutral option.
+        Checks whether entailment has the maximum softmax probability.
+
+        Inputs:
+            text1: str
+                Does text1 entail text2?
+            text2: str
+                Does text1 entail text2?
+        
+        Output:
+            bool: indication of whether text1 entails text2
         '''
         softmax_probs = self._get_probs(text1, text2)
 
@@ -83,7 +111,16 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
         
     def aggregate(self, responses: list[str], verbose: bool=False):
         '''
-        DOCSTRING
+        Utilizes algorithm 1 as described in semantic entropy paper (Kuhn et al. (2023)) to bin
+        multiple texts into "semantic equivalence classes". Then aggregates into "unalikeness" metric
+
+        Inputs:
+            responses: list[str]
+                List of responses that LLM outputs given a particular query
+            verbose: bool
+                represents whether you want to visualize progress
+        Outputs:
+            int: "unalikeness" metric using BiDirectional Entailment
         '''
         # implementation of algorithm 1 as described in semantic entropy paper
         N = len(responses)
@@ -144,3 +181,4 @@ if __name__ == '__main__':
 
     score = evaluator.aggregate(responses, verbose=True)
     print(f'The unalikeness metric is: {score: .2f}')
+

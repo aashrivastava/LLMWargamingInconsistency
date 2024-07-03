@@ -13,19 +13,36 @@ import random
 
 class RankEval(EvaluatorBasics):
     '''
-    IMPLEMENT DOCSTRING
+    Used to calculate "unalikeness" metric given N rankings. There are 3 currently implemented metrics:
+        kendall's tau
+        spearman's rank coefficient
+        hamming distance
     '''
     def __init__(self, method: str='kendall'):
         self.method = method
         super().__init__()
     
-    def make_assertions(self, rank1: dict[str, int], rank2: dict[str, int]):
+    def make_assertions(self, rank1: dict[str, int], rank2: dict[str, int]) -> None:
+        '''
+        Asserts that the rankings to compare have same size and rank the same categories
+        '''
         assert len(rank1) == len(rank2)
         assert rank1.keys() == rank2.keys()
     
-    def _kendalls_tau(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False):
+    def _kendalls_tau(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False) -> float:
         '''
-        IMPLEMENT DOCSTRING
+        Calculates kendall's tau between two rankings. Rescaled from [-1, 1] to [0, 1]
+
+        Inputs:
+            rank1: dict[str, int]
+                keys are category and the value is associated category's rank
+            rank2: dict[str, int]
+                keys are category and the value is associated category's rank
+            verbose: bool   
+                represents whether you want to visualize progress
+        
+        Output:
+            float: Rescaled kendall's tau metric between given ranks
         '''
         self.make_assertions(rank1, rank2)
         
@@ -57,9 +74,19 @@ class RankEval(EvaluatorBasics):
 
         return tau
     
-    def _aggregate_kendalls(self, responses: list[dict[str, int]], verbose: bool=False):
+    def _aggregate_kendalls(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
         '''
-        IMPLEMENT DOCSTRING
+        Calculates "unalikness" metric for list of N responses based on kendall's tau. Basically just takes average of (1- kendall's tau)
+        for each pair of responses
+
+        Inputs:
+            responses: list[str]
+                List of responses that LLM outputs given a particular query
+            verbose: bool
+                represents whether you want to visualize progress
+        
+        Outputs:
+            float: "unalikeness" metric using kendall's tau
         '''
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         N = len(responses)
@@ -72,9 +99,20 @@ class RankEval(EvaluatorBasics):
         return tot / math.comb(N, 2)
         # get pairs and think about how to aggregate
     
-    def _spearmans_coef(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False):
+    def _spearmans_coef(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False) -> float:
         '''
-        IMPLEMENT DOCSTRING
+        Calculates spearman's rank coefficient between two rankings. Rescaled from [-1, 1] to [0, 1]
+
+        Inputs:
+            rank1: dict[str, int]
+                keys are category and the value is associated category's rank
+            rank2: dict[str, int]
+                keys are category and the value is associated category's rank
+            verbose: bool   
+                represents whether you want to visualize progress
+        
+        Output:
+            float: Rescaled spearman's coefficient between given ranks
         '''
         self.make_assertions(rank1, rank2)
 
@@ -88,9 +126,19 @@ class RankEval(EvaluatorBasics):
         # linearly normalized into [0,1] instead of [-1, 1]
         return (2 - ((6 * sum_diffs)/(n*(n**2 - 1))))/2
     
-    def _aggregate_spearmans(self, responses: list[dict[str, int]], verbose: bool=False):
+    def _aggregate_spearmans(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
         '''
-        IMPLEMENT DOCSTRING
+        Calculates "unalikness" metric for list of N responses based on spearman's coefficient. Basically just takes average of 
+        (1- spearman's coefficient) for each pair of responses
+
+        Inputs:
+            responses: list[str]
+                List of responses that LLM outputs given a particular query
+            verbose: bool
+                represents whether you want to visualize progress
+        
+        Outputs:
+            float: "unalikeness" metric using spearman's rank coefficient
         '''
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         N = len(responses)
@@ -102,9 +150,21 @@ class RankEval(EvaluatorBasics):
         
         return tot / math.comb(N, 2)
     
-    def _hamming_distance(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False):
+    def _hamming_distance(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False) -> float:
         '''
-        implement docstring
+        Calculates Hamming distance between two rankings. Simply counts how many differences in rankings there are.
+        I divide by the number of categories to rescale to a number between [0,1]
+
+        Inputs:
+            rank1: dict[str, int]
+                keys are category and the value is associated category's rank
+            rank2: dict[str, int]
+                keys are category and the value is associated category's rank
+            verbose: bool   
+                represents whether you want to visualize progress
+        
+        Output:
+            float: Rescaled spearman's coefficient between given ranks
         '''
         self.make_assertions(rank1, rank2)
 
@@ -116,9 +176,19 @@ class RankEval(EvaluatorBasics):
             
         return tot_diffs / len(rank1)
     
-    def _aggregate_hamming(self, responses: list[dict[str, int]], verbose: bool=False):
+    def _aggregate_hamming(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
         '''
-        IMPLEMENT DOCSTRING
+        Calculates "unalikness" metric for list of N responses based on rescaled hamming distance. Basically just takes average of 
+        hamming distance for each pair of responses
+
+        Inputs:
+            responses: list[str]
+                List of responses that LLM outputs given a particular query
+            verbose: bool
+                represents whether you want to visualize progress
+        
+        Outputs:
+            float: "unalikeness" metric using hamming distance
         '''
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         N = len(responses)
@@ -129,7 +199,19 @@ class RankEval(EvaluatorBasics):
         
         return tot / math.comb(N, 2)
     
-    def aggregate(self, responses, verbose: bool=False):
+    def aggregate(self, responses, verbose: bool=False) -> float:
+        '''
+        Depending on what method was specified in the constructor, choose which aggregator to use
+
+        Inputs:
+            responses: list[str]
+                List of responses that LLM outputs given a particular query
+            verbose: bool
+                represents whether you want to visualize progress
+        
+        Outputs:
+            float: "unalikeness" metric using specified metric from constructor
+        '''
         assert len(responses) >= 2
 
         if self.method == 'kendall':
@@ -153,5 +235,4 @@ if __name__ == '__main__':
     print(f'Hamming: {evaluator.aggregate(random_rankings, method='hamming')}')
     print(f'Spearmans: {evaluator.aggregate(random_rankings, method='spearman')}')
     print(f'Kendall: {evaluator.aggregate(random_rankings, method='kendall')}')
-
 

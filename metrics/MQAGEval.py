@@ -35,18 +35,39 @@ class MQAGEval(EvaluatorBasics):
         print(f'MQAGScoreEval initialized to {self.device}')
     
 
-    def score_questions(self, cand: str, ref: str, verbose: bool=False) -> int:
+    def score_questions(self, cand: str, ref: str, verbose: bool=False) -> float:
         '''
-        IMPLEMENT DOCSTRING
+        Given two texts (candidate and reference), score the questions based on answers supported
+        by the two texts. The score depends on the scoring method described by MQAG paper (Manakul et al. (2023)).
+        On a high level, the scores represent various statistical distances between the probabilities assigned to answers supported by text 1
+        and probabilities assigned to answers supported by text 2
+
+        Inputs:
+            NOTE: cand and ref are arbitrary. e.g. metric should be same if text1 is cand or text1 is ref as long as text2 is the same
+            cand: str
+                One of the texts to base the answering on
+            ref: str
+                Other text to base the answering on
+        Output:
+            float: statistical distance between answers based on the cand and ref text
         '''
         score = self.model.score(candidate=cand, reference=ref, num_questions=self.num_questions, verbose=verbose)
         score = score[self.scoring_method] # 0 is most alike, 1 is most unalike
 
         return score
     
-    def aggregate(self, responses: list[str], verbose: bool=False) -> int:
+    def aggregate(self, responses: list[str], verbose: bool=False) -> float:
         '''
-        IMPLEMENT DOCSTRING
+        Generates "unalikeness" metric across a list of N responses when you use MQAG to generate consistency scores across
+        two texts.
+
+        Inputs:
+            responses: list[str]
+                List of responses that LLM outputs given a particular query
+            verbose: bool
+                represents whether you want to visualize progress
+        Outputs:
+            float: "unalikeness" metric using MQAG
         '''
         N = len(responses)
         pairs = self.create_unique_pairs(responses, verbose=verbose)
