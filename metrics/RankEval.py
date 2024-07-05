@@ -29,6 +29,28 @@ class RankEval(EvaluatorBasics):
         assert len(rank1) == len(rank2)
         assert rank1.keys() == rank2.keys()
     
+    def _for_analysis(self, responses: list[dict[str, int]]) -> tuple[list[float], list[float]]:
+        '''
+        just to do analysis on distribution of method
+        '''
+        if self.method == 'kendall':
+            to_use = self._kendalls_tau
+        elif self.method == 'spearman':
+            to_use = self._spearmans_coef
+        elif self.method == 'hamming':
+            to_use = self._hamming_distance
+        
+        pairs = self.create_unique_pairs(responses)
+        metrics = []
+        one_minus = []
+        for r1, r2 in pairs:
+            metric = to_use(r1, r2)
+            metrics.append(metric)
+            one_minus.append(1 - metric)
+        
+        return metrics, one_minus
+
+
     def _kendalls_tau(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False) -> float:
         '''
         Calculates kendall's tau between two rankings. Rescaled from [-1, 1] to [0, 1]
@@ -94,7 +116,11 @@ class RankEval(EvaluatorBasics):
         # aggregator according to formula seen in paper
         tot = 0
         for r1, r2 in tqdm(pairs, desc='Calculating RankEval using Kendall\'s Tau...', disable=not verbose):
-            tot += (1 - self._kendalls_tau(r1, r2, verbose=verbose))
+            curr_tau = self._kendalls_tau(r1, r2, verbose=verbose)
+            taus.append(curr_tau)
+            one_minus_taus.append(1 - curr_tau)
+            tot += (1 - curr_tau)
+        
         
         return tot / math.comb(N, 2)
         # get pairs and think about how to aggregate
@@ -199,7 +225,7 @@ class RankEval(EvaluatorBasics):
         
         return tot / math.comb(N, 2)
     
-    def aggregate(self, responses, verbose: bool=False) -> float:
+    def aggregate(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
         '''
         Depending on what method was specified in the constructor, choose which aggregator to use
 
