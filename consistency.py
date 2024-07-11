@@ -1,4 +1,5 @@
 from utils.promptopenai import OpenAIPrompting
+from utils.game import GameSimulator
 from metrics.BERTScoreEval import BERTScoreEval
 from metrics.BiDirectionalEntailmentEval import BiDirectionalEntailmentEval
 from metrics.MQAGEval import MQAGEval
@@ -17,7 +18,7 @@ class ConsistencyEval:
         '''
         assert metric in ['bert', 'bidirection', 'mqag', 'rank']
         # assertion that given model is valid
-        self.prompter = OpenAIPrompting(model=prompting_model)
+        self.simulator = OpenAIPrompting(model=prompting_model)
         self.metric = metric
         if self.metric == 'bert':
             self.aggregator = BERTScoreEval(**kwargs)
@@ -29,23 +30,7 @@ class ConsistencyEval:
             self.aggregator = RankEval(**kwargs)
         else:
             raise MyException(f'{self.metric} is not valid')
-        
-    def get_responses(self, prompt, N_responses=8, temperature=1.0):
-        '''
-        IMPLEMENT DOCSTRING
-        '''
-        completion = self.prompter.get_ChatCompletions(prompt, 
-                            N_responses=N_responses)
-        # parse for semantic
-        if self.metric in ['bert', 'bidirection', 'mqag', 'rank']:
-            parsed_outputs = self.prompter.parse_outputs(completion)
-            return parsed_outputs
-        else:
-            parsed_outputs = self.prompter.parse_outputs(completion)
-            rankings = self.prompter.get_rankings(parsed_outputs)
-            return rankings
-        
-    
+
     def aggregate(self, responses, verbose: bool=False):
         return self.aggregator.aggregate(responses, verbose=verbose)
     

@@ -1,6 +1,7 @@
 import openai as oai
 import os
 import typing
+import json
 # from tqdm import tqdm
 
 ## WHAT TO DO FOR LATER/TOMORROW
@@ -42,10 +43,91 @@ class OpenAIPrompting:
         self.model = model
         # self.n_responses = n_responses
         self.client = oai.OpenAI(
-            organization=os.environ.get('OPENAI_ORG_KEY')
+            organization=os.environ.get('OPENAI_ORG_KEY'),
+            project=os.environ.get('OPENAI_PROJECT_ID')
         )
     
-    def get_ChatCompletions(self, prompt: dict[str, str], N_responses: int=20, temperature: int=1.0):
+    def get_text_path(self, file_to_use: str) -> str:
+        curr_path = os.getcwd()
+        parent_directory = os.path.dirname(curr_path)
+        wargame_folder_path = os.path.join(parent_directory, 'wargame')
+        file_to_use_path = os.path.join(wargame_folder_path, file_to_use)
+
+        return file_to_use_path
+    
+    def get_replacement_path(self, replacement_to_use: str) -> str:
+        curr_path = os.getcwd()
+        parent_directory = os.path.dirname(curr_path)
+        wargame_folder_path = os.path.join(parent_directory, 'wargame')
+        replacements_path = os.path.join(wargame_folder_path, replacement_to_use)
+
+        return replacements_path
+
+    def create_system_prompt(self, control_level: str='free', explicit_country: bool=True) -> str:
+        if control_level == 'free':
+            file_to_use = 'system_free.txt'
+        elif control_level == 'rank':
+            file_to_use = 'system_options.txt'
+        elif control_level == 'nudge':
+            file_to_use = 'system_nudge.txt'
+        else:
+            raise FileNotFoundError('Invalid control_level')
+        
+        if explicit_country:
+            replacement_file = 'replacement_explicit.json'
+        else:
+            replacement_file = 'replacement_anonymous.json'
+        
+        file_to_use_path = self.get_text_path(file_to_use)
+        replacement_to_use_path = self.get_replacement_path(replacement_file)
+
+        with open(replacement_to_use_path, 'r') as f:
+            replacements = json.load(f)
+        
+        with open(file_to_use_path, 'r') as f:
+            system_prompt = f.read()
+        
+        system_prompt = system_prompt.format(**replacements)
+
+        return system_prompt
+    
+    def create_context(self, explicit_country: bool=True) -> str:
+        scenario = 'scenario.txt'
+        avail_forces = 'available_forces.txt'
+
+        if explicit_country:
+            replacement_file = 'replacement_explicit.json'
+            nation_description = None
+        else:
+            replacement_file = 'replacement_anonymous.json'
+            nation_description = 'nation_descriptions.txt'
+        
+        # go through directory to find path for file
+        scenario_path = self.get_text_path(scenario)
+        avail_forces_path = self.get_text_path(avail_forces)
+        if nation_description:
+            nation_desc_path = self.get_text_path(nation_description)
+        else:
+            nation_desc_path = None
+        replacement_to_use_path = self.get_replacement_path(replacement_file)
+
+
+        with open(replacement_to_use_path, 'r') as f:
+            replacements = json.load(f)
+        
+        try:
+            with open(scenario_path, 'r') as f1, open(avail_forces_path, 'r') as f2, open(nation_desc_path, 'r') as f3:
+                context = f3.read() + '\n\n' + f1.read() + '\n\n' + f2.read()
+        except TypeError:
+            with open(scenario_path, 'r') as f1, open(avail_forces_path, 'r') as f2:
+                context = f1.read() + '\n\n' + f2.read()
+        
+        context = context.format(**replacements)
+
+        return context
+        
+        
+    def get_completions(self, curr_chat: list[dict[str, str]], N_responses: int=20, temperature: int=1.0):
         '''
         ## TODO:
         ##  Implement **kwargs so that user can pass other things if they want beyond these explicit ones
@@ -59,17 +141,19 @@ class OpenAIPrompting:
         Output:
             Chat completion given by openai api based on prompt and hyperparameters
         '''
-        return self.client.chat.completions.create(
+        print(curr_chat)
+        completions = self.client.chat.completions.create(
             model = self.model,
-            messages = [
-                {'role': 'system', 'content': prompt['system']},
-                {'role': 'user', 'content': prompt['user']}
-            ],
+            messages = curr_chat,
             n = N_responses,
             temperature = temperature,
         )
+        # just append first response from LLM to chat history 
+        ## VERIFY THIS AS GOOD METHODOLOGY
+        curr_chat.append({'role': completions.choices[0].message.role, 'content': completions.choices[0].message.content})
+        return completions
     
-    def parse_outputs(self, response) -> list[str]:
+    def parse_outputs(self, response, control_level) -> list[str]:
         '''
         Get list of strings which is just the text outputs of the chat completions given by openai api
 
@@ -106,5 +190,5 @@ class OpenAIPrompting:
 
 if __name__ == '__main__':
     prompter = OpenAIPrompting(model='gpt-3.5-turbo')
-    response = prompter.get_ChatCompletions({'system': 'rank the options. Format your response where each action is on its own line with the highest rank on top', 'user': 'A\nB\nC'}, N_responses=1)
-    print(response.choices[0].message.content)
+    response = prompter.create_context(False)
+    print(response)
