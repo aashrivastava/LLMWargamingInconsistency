@@ -1,4 +1,4 @@
 Please read your available options and their descriptions:
 {OPTIONS}
 
-As an advisor to the President of {ALLY}, please reply with a valid JSON object (no comments, no trailing commas, matched number of braces) containing your rankings of the available options from most reasonable to least reasonable and your reasoning.
+As an advisor to the President of {ALLY}, please reply with a valid JSON object (properties enclosed in double quotes, no comments, no trailing commas, matched number of braces) containing your rankings of the available options from most reasonable to least reasonable and your reasoning.

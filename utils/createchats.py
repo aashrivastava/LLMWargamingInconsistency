@@ -120,7 +120,7 @@ class ChatCreation:
 
         return move_1
     
-    def move_1(self):
+    def move_1(self) -> list[dict[str, str]]:
         system_prompt = self.create_system_prompt()
         first_message = self.create_context() + self.create_incident1_and_question()
 
