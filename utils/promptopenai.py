@@ -127,7 +127,7 @@ class OpenAIPrompting:
         return context
         
         
-    def get_completions(self, curr_chat: list[dict[str, str]], N_responses: int=20, temperature: int=1.0):
+    def get_completions(self, curr_chat: list[dict[str, str]], N_responses: int=20, temperature: int=1.0, json_mode: bool=True):
         '''
         ## TODO:
         ##  Implement **kwargs so that user can pass other things if they want beyond these explicit ones
@@ -142,7 +142,7 @@ class OpenAIPrompting:
             Chat completion given by openai api based on prompt and hyperparameters
         '''
         # gpt-4 does not accept response_format parameter
-        if self.model != 'gpt-4':
+        if json_mode:
             completions = self.client.chat.completions.create(
                 model = self.model,
                 messages = curr_chat,

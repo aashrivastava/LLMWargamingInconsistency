@@ -21,10 +21,9 @@ class MQAGEval(EvaluatorBasics):
     Takes N sampled responses for a given query and calculates BERTScore between all combinations of pairs. Also aggregates these scores into one metric within 
     range [0, 1]. 
     '''
-    def __init__(self, model: str='race', device: str='cuda', num_questions: int=3, scoring_method: str='counting'):
+    def __init__(self, model: str='race', device: str='cuda', num_questions: int=3):
         print('Initializing MQAG Evaluator...')
         self.num_questions = num_questions
-        self.scoring_method = scoring_method
         if device == 'cuda':
             self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         else:
@@ -35,7 +34,7 @@ class MQAGEval(EvaluatorBasics):
         print(f'MQAGScoreEval initialized to {self.device}')
     
 
-    def score_questions(self, cand: str, ref: str, verbose: bool=False) -> float:
+    def score_questions(self, cand: str, ref: str, method: str='counting', verbose: bool=False) -> float:
         '''
         Given two texts (candidate and reference), score the questions based on answers supported
         by the two texts. The score depends on the scoring method described by MQAG paper (Manakul et al. (2023)).
@@ -52,11 +51,11 @@ class MQAGEval(EvaluatorBasics):
             float: statistical distance between answers based on the cand and ref text
         '''
         score = self.model.score(candidate=cand, reference=ref, num_questions=self.num_questions, verbose=verbose)
-        score = score[self.scoring_method] # 0 is most alike, 1 is most unalike
+        score = score[method] # 0 is most alike, 1 is most unalike
 
         return score
     
-    def aggregate(self, responses: list[str], verbose: bool=False) -> float:
+    def aggregate(self, responses: list[str], method: str='counting', verbose: bool=False) -> float:
         '''
         Generates "unalikeness" metric across a list of N responses when you use MQAG to generate consistency scores across
         two texts.
@@ -73,7 +72,7 @@ class MQAGEval(EvaluatorBasics):
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         tot = 0
         for t1, t2 in tqdm(pairs, desc='Calculating MQAGEval...', disable=not verbose):
-            tot += self.score_questions(t1, t2, num_questions=self.num_questions, scoring_method=scoring_method, verbose=verbose)
+            tot += self.score_questions(t1, t2, num_questions=self.num_questions, scoring_method=method, verbose=verbose)
         
         return tot / math.comb(N, 2)
     

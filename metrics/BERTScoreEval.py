@@ -32,7 +32,7 @@ class BERTScoreEval(EvaluatorBasics):
         super().__init__()
         print(f'BERTScore Evaluator Initialized to {self.device}') # probably replace print with logging
 
-    def aggregate(self, responses: list[str], verbose: bool = False) -> int:
+    def aggregate(self, responses: list[str], verbose: bool = False, **kwargs) -> int:
         '''
         Given a list of N responses, generate the "unalikeness" metric using BERTScore.
 

@@ -109,7 +109,7 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
 
         return True if torch.argmax(softmax_probs) == 0 else False
         
-    def aggregate(self, responses: list[str], verbose: bool=False):
+    def aggregate(self, responses: list[str], verbose: bool=False, **kwargs):
         '''
         Utilizes algorithm 1 as described in semantic entropy paper (Kuhn et al. (2023)) to bin
         multiple texts into "semantic equivalence classes". Then aggregates into "unalikeness" metric

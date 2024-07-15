@@ -31,10 +31,10 @@ class ChatCreation:
     def create_system_prompt(self):
         if self.control_level == 'free':
             file_to_use = 'system_free.txt'
-        elif control_level == 'rank':
-            self.file_to_use = 'system_options.txt'
-        elif control_level == 'nudge':
-            self.file_to_use = 'system_nudge.txt'
+        elif self.control_level == 'rank':
+            file_to_use = 'system_options_nojson.txt'
+        elif self.control_level == 'nudge':
+            file_to_use = 'system_nudge.txt'
         else:
             raise FileNotFoundError('Invalid control_level')
         
@@ -58,7 +58,7 @@ class ChatCreation:
     
     def create_context(self) -> str:
         scenario = 'scenario.txt'
-        avail_forces = 'available_forces.txt'
+        # avail_forces = 'available_forces.txt'
 
         if self.explicit_country:
             replacement_file = 'replacement_explicit.json'
@@ -69,7 +69,7 @@ class ChatCreation:
         
         # go through directory to find path for file
         scenario_path = self.get_text_path(scenario)
-        avail_forces_path = self.get_text_path(avail_forces)
+        # avail_forces_path = self.get_text_path(avail_forces)
         if nation_description:
             nation_desc_path = self.get_text_path(nation_description)
         else:
@@ -81,11 +81,11 @@ class ChatCreation:
             replacements = json.load(f)
         
         try:
-            with open(scenario_path, 'r') as f1, open(avail_forces_path, 'r') as f2, open(nation_desc_path, 'r') as f3:
-                context = f3.read() + '\n\n' + f1.read() + '\n\n' + f2.read()
+            with open(scenario_path, 'r') as f1, open(nation_desc_path, 'r') as f3: #open(avail_forces_path, 'r') as f2, 
+                context = f3.read() + '\n\n' + f1.read() + '\n\n'
         except TypeError:
-            with open(scenario_path, 'r') as f1, open(avail_forces_path, 'r') as f2:
-                context = f1.read() + '\n\n' + f2.read()
+            with open(scenario_path, 'r') as f1: # open(avail_forces_path, 'r') as f2
+                context = f1.read() + '\n\n'
         
         context = context.format(**replacements)
 
@@ -99,7 +99,7 @@ class ChatCreation:
         elif self.control_level == 'nudge':
             question = 'question_nudge.txt'
         else:
-            question = 'question_options.txt'
+            question = 'question_options_nojson.txt'
 
         if self.explicit_country:
             replacement_file = 'replacement_explicit.json'
@@ -114,6 +114,7 @@ class ChatCreation:
             replacements = json.load(f)
         
         with open(incident_path, 'r') as f1, open(question_path, 'r') as f2:
+            
             move_1 = f1.read() + '\n\n' + f2.read()
         
         move_1 = move_1.format(**replacements)
@@ -138,7 +139,7 @@ class ChatCreation:
         elif self.control_level == 'nudge':
             question = 'question_nudge.txt'
         else:
-            question = 'question_options.txt'
+            question = 'question_options_nojson.txt'
 
         if self.explicit_country:
             replacement_file = 'replacement_explicit.json'
@@ -163,7 +164,11 @@ class ChatCreation:
     def move_2(self, chat_hist):
         chat_hist.append({'role': 'user', 'content': self.create_incident2_and_question()})
 
-        
+
+if __name__ == '__main__':
+    x = ChatCreation('rank', True)
+    y = x.move_1()
+    print(y[0]['content'], y[1]['content'])
     
 
 

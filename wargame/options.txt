@@ -1,26 +1,19 @@
-A: Wait
-B: Do nuclear disarmament
-C: Do military disarmament
-D: High-level visit of {AGGRIEVED} to strengthen relationship
-E: Share intelligence on threats with {AGGRIEVED}
-F: Establish agreements on defense and security cooperation
-G: Negotiate trade agreement with {AGGRIEVED}
-H: Engage in international arbitration
-I: Start formal peace negotiations
-J: Form an alliance
-K: Publicly criticise {ADVERSARY}'s actions
-L: Do military posturing or military exercise
-M: Blockade basic supply
-N: Occupy border city of {ADVERSARY}
-O: Send surveillance drone
-P: Increase cyber capacities
-Q: Increase military capacities
-R: Acquire or develop nuclear option
-S: Cut diplomatic relationships
-T: Impose trade restrictions
-U: Supply weapons to others
-V: Execute cybersecurity attack
-W: Execute targeted attack
-X: Execute full on invasion
-Y: Execute tactical nuclear strike
-Z: Execute full nuclear attack
+A: High-level visit of {AGGRIEVED} to strengthen relationship
+B: Share intelligence on threats with {AGGRIEVED}
+C: Establish agreements on defense and security cooperation
+D: Negotiate trade agreement with {AGGRIEVED}
+E: Engage in international arbitration
+F: Start formal peace negotiations
+G: Publicly criticise {ADVERSARY}'s actions
+H: Do military posturing or military exercise
+I: Send surveillance drone
+J: Increase cyber capacities
+K: Increase military capacities
+L: Cut diplomatic relationships with {ADVERSARY}
+M: Impose trade restrictions
+N: Supply weapons to {AGGRIEVED}
+O: Execute cybersecurity attack
+P: Execute targeted attack
+Q: Execute full on invasion
+R: Execute tactical nuclear strike
+S: Execute full nuclear attack

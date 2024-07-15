@@ -18,8 +18,7 @@ class RankEval(EvaluatorBasics):
         spearman's rank coefficient
         hamming distance
     '''
-    def __init__(self, method: str='kendall'):
-        self.method = method
+    def __init__(self):
         super().__init__()
     
     def make_assertions(self, rank1: dict[str, int], rank2: dict[str, int]) -> None:
@@ -27,20 +26,20 @@ class RankEval(EvaluatorBasics):
         Asserts that the rankings to compare have same size and rank the same categories
         '''
         assert len(rank1) == len(rank2)
-        assert rank1.keys() == rank2.keys()
+        # assert rank1.keys() == rank2.keys()
     
-    def _for_analysis(self, responses: list[dict[str, int]]) -> tuple[list[float], list[float]]:
+    def _for_analysis(self, parsed_responses: list[dict[str, int]], method: str='kendall') -> tuple[list[float], list[float]]:
         '''
         just to do analysis on distribution of method
         '''
-        if self.method == 'kendall':
+        if method == 'kendall':
             to_use = self._kendalls_tau
-        elif self.method == 'spearman':
+        elif method == 'spearman':
             to_use = self._spearmans_coef
-        elif self.method == 'hamming':
+        elif method == 'hamming':
             to_use = self._hamming_distance
         
-        pairs = self.create_unique_pairs(responses)
+        pairs = self.create_unique_pairs(parsed_responses)
         metrics = []
         one_minus = []
         for r1, r2 in pairs:
@@ -96,20 +95,23 @@ class RankEval(EvaluatorBasics):
 
         return tau
     
-    def _aggregate_kendalls(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
+    def _aggregate_kendalls(self, responses: list[list[str]], verbose: bool=False) -> float:
         '''
         Calculates "unalikness" metric for list of N responses based on kendall's tau. Basically just takes average of (1- kendall's tau)
         for each pair of responses
 
         Inputs:
-            responses: list[str]
-                List of responses that LLM outputs given a particular query
+            responses: list[list[str]]
+                List of rankings that LLM gives
             verbose: bool
                 represents whether you want to visualize progress
         
         Outputs:
             float: "unalikeness" metric using kendall's tau
         '''
+        # get dictionary datatype
+        responses = [{category: i+1 for i, category in enumerate(response)} for response in responses]
+
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         N = len(responses)
         
@@ -117,8 +119,8 @@ class RankEval(EvaluatorBasics):
         tot = 0
         for r1, r2 in tqdm(pairs, desc='Calculating RankEval using Kendall\'s Tau...', disable=not verbose):
             curr_tau = self._kendalls_tau(r1, r2, verbose=verbose)
-            taus.append(curr_tau)
-            one_minus_taus.append(1 - curr_tau)
+            # taus.append(curr_tau)
+            # one_minus_taus.append(1 - curr_tau)
             tot += (1 - curr_tau)
         
         
@@ -152,7 +154,7 @@ class RankEval(EvaluatorBasics):
         # linearly normalized into [0,1] instead of [-1, 1]
         return (2 - ((6 * sum_diffs)/(n*(n**2 - 1))))/2
     
-    def _aggregate_spearmans(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
+    def _aggregate_spearmans(self, responses: list[list[str]], verbose: bool=False) -> float:
         '''
         Calculates "unalikness" metric for list of N responses based on spearman's coefficient. Basically just takes average of 
         (1- spearman's coefficient) for each pair of responses
@@ -166,6 +168,7 @@ class RankEval(EvaluatorBasics):
         Outputs:
             float: "unalikeness" metric using spearman's rank coefficient
         '''
+        responses = [{category: i+1 for i, category in enumerate(response)} for response in responses]
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         N = len(responses)
         
@@ -202,7 +205,7 @@ class RankEval(EvaluatorBasics):
             
         return tot_diffs / len(rank1)
     
-    def _aggregate_hamming(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
+    def _aggregate_hamming(self, responses: list[list[str]], verbose: bool=False) -> float:
         '''
         Calculates "unalikness" metric for list of N responses based on rescaled hamming distance. Basically just takes average of 
         hamming distance for each pair of responses
@@ -216,6 +219,7 @@ class RankEval(EvaluatorBasics):
         Outputs:
             float: "unalikeness" metric using hamming distance
         '''
+        responses = [{category: i+1 for i, category in enumerate(response)} for response in responses]
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         N = len(responses)
         
@@ -225,9 +229,9 @@ class RankEval(EvaluatorBasics):
         
         return tot / math.comb(N, 2)
     
-    def aggregate(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
+    def aggregate(self, responses: list[list[str]], metric: str='kendall', verbose: bool=False) -> float:
         '''
-        Depending on what method was specified in the constructor, choose which aggregator to use
+        Depending on what metric was specified in the constructor, choose which aggregator to use
 
         Inputs:
             responses: list[str]
@@ -240,25 +244,22 @@ class RankEval(EvaluatorBasics):
         '''
         assert len(responses) >= 2
 
-        if self.method == 'kendall':
+        if metric == 'kendall':
             return self._aggregate_kendalls(responses, verbose=verbose)
-        elif self.method == 'spearman':
+        elif metric == 'spearman':
             return self._aggregate_spearmans(responses, verbose=verbose)
-        elif self.method == 'hamming':
+        elif metric == 'hamming':
             return self._aggregate_hamming(responses, verbose=verbose)
+        else: raise NameError('This is not a valid metric')
         
 if __name__ == '__main__':
-    def generate_random_ranking():
-        items = ['a', 'b', 'c', 'd']
-        random.shuffle(items)
-        return {item: rank + 1 for rank, item in enumerate(items)}
-    
-    random_rankings = [generate_random_ranking() for _ in range(10000)]
-    for i, ranking in enumerate(random_rankings, start=1):
-        print(f"Ranking {i}: {ranking}")
+    rank1 = ['a', 'b', 'c', 'd']
+    rank2 = ['a', 'b', 'c', 'd']
+    rank3 = ['d', 'c', 'b','a']
+
+    rankings = [rank1, rank3]
+    print(rankings)
 
     evaluator = RankEval()
-    print(f'Hamming: {evaluator.aggregate(random_rankings, method='hamming')}')
-    print(f'Spearmans: {evaluator.aggregate(random_rankings, method='spearman')}')
-    print(f'Kendall: {evaluator.aggregate(random_rankings, method='kendall')}')
+    print(f'Kendall: {evaluator.aggregate(rankings, metric='spearman')}')
 
