@@ -30,7 +30,46 @@ class GameSimulator:
             self.prompter = OpenAIPrompting(model=self.model)
         else:
             self.prompter = None
+    
+    def run_basic(self):
+        responses = []
+        first_prompt = self.chatcreator.move_1()
+        curr_chat = first_prompt
 
+        if self.prompter:
+            print('Getting move 1 completions...')
+            move1_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature, json_mode=self.json_mode)
+            outputs_1 = self.prompter.parse_outputs(move1_completions, self.control_level)
+            print('Got move 1 completions!')
+            responses.append(outputs_1)
+            self.chatcreator.move_2(curr_chat)
+            print('Getting move 2 completions...')
+            move2_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature, json_mode=self.json_mode)
+            outputs_2 = self.prompter.parse_outputs(move2_completions, self.control_level)
+            print('Got move 2 completions!')
+            responses.append(outputs_2)
+        # dummy is running
+        else:
+            o_1 = ['text move 1' for i in range(self.N_responses)]
+            responses.append(o_1)
+            o_2 = ['text move 2' for i in range(self.N_responses)]
+            responses.append(o_2)
+        
+        return responses
+    
+    def write_outputs(self, outputs: list[list[str], list[str]], save_dir: str, f_name: str='outputs') -> None:
+        '''
+        DOCSTRING
+        '''
+        response_f = f'{save_dir}/{f_name}'
+        labels = ['Move 1 Responses', 'Move 2 Responses']
+
+        with open(f'{response_f}.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            header = ['Move Number'] + [f'Response {i+1}' for i in range(self.N_responses)]
+            writer.writerow(header)
+            for label, move_i_outputs in zip(labels, outputs):
+                writer.writerow([label] + move_i_outputs)
     
     def run(self):
         responses = []
@@ -54,7 +93,7 @@ class GameSimulator:
                 if self.control_level == 'rank':
                     ranking = output.strip().split('\n')
                     if len(ranking) == 19:
-                        orders_move1.append(output.strip().split('\n'))
+                        orders_move1.append(ranking)
                     else:
                         weird_outputs_move1.append(output)
                         print('Found weird')
@@ -70,8 +109,6 @@ class GameSimulator:
                     if not found_weird:
                         try:
                             orders = output_json['orders']
-                            if self.control_level == 'rank':
-                                assert len(orders) == 19
                             orders_move1.append(orders)
                         except:
                             weird_outputs_move1.append(output)
@@ -107,7 +144,7 @@ class GameSimulator:
                 if self.control_level == 'rank':
                     ranking = output.strip().split('\n')
                     if len(ranking) == 19:
-                        orders_move2.append(output.strip().split('\n'))
+                        orders_move2.append(ranking)
                     else:
                         weird_outputs_move2.append(output)
                         print('Found weird')
@@ -123,8 +160,6 @@ class GameSimulator:
                     if not found_weird:
                         try:
                             orders = output_json['orders']
-                            if self.control_level == 'rank':
-                                assert len(orders) == 19
                             orders_move2.append(orders)
                         except:
                             weird_outputs_move2.append(output)
