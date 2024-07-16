@@ -26,7 +26,7 @@ class RankEval(EvaluatorBasics):
         Asserts that the rankings to compare have same size and rank the same categories
         '''
         assert len(rank1) == len(rank2)
-        # assert rank1.keys() == rank2.keys()
+        assert rank1.keys() == rank2.keys()
     
     def _for_analysis(self, parsed_responses: list[dict[str, int]], method: str='kendall') -> tuple[list[float], list[float]]:
         '''
@@ -95,7 +95,7 @@ class RankEval(EvaluatorBasics):
 
         return tau
     
-    def _aggregate_kendalls(self, responses: list[list[str]], verbose: bool=False) -> float:
+    def _aggregate_kendalls(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
         '''
         Calculates "unalikness" metric for list of N responses based on kendall's tau. Basically just takes average of (1- kendall's tau)
         for each pair of responses
@@ -109,8 +109,6 @@ class RankEval(EvaluatorBasics):
         Outputs:
             float: "unalikeness" metric using kendall's tau
         '''
-        # get dictionary datatype
-        responses = [{category: i+1 for i, category in enumerate(response)} for response in responses]
 
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         N = len(responses)
@@ -154,7 +152,7 @@ class RankEval(EvaluatorBasics):
         # linearly normalized into [0,1] instead of [-1, 1]
         return (2 - ((6 * sum_diffs)/(n*(n**2 - 1))))/2
     
-    def _aggregate_spearmans(self, responses: list[list[str]], verbose: bool=False) -> float:
+    def _aggregate_spearmans(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
         '''
         Calculates "unalikness" metric for list of N responses based on spearman's coefficient. Basically just takes average of 
         (1- spearman's coefficient) for each pair of responses
@@ -168,7 +166,6 @@ class RankEval(EvaluatorBasics):
         Outputs:
             float: "unalikeness" metric using spearman's rank coefficient
         '''
-        responses = [{category: i+1 for i, category in enumerate(response)} for response in responses]
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         N = len(responses)
         
@@ -205,7 +202,7 @@ class RankEval(EvaluatorBasics):
             
         return tot_diffs / len(rank1)
     
-    def _aggregate_hamming(self, responses: list[list[str]], verbose: bool=False) -> float:
+    def _aggregate_hamming(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
         '''
         Calculates "unalikness" metric for list of N responses based on rescaled hamming distance. Basically just takes average of 
         hamming distance for each pair of responses
@@ -219,7 +216,6 @@ class RankEval(EvaluatorBasics):
         Outputs:
             float: "unalikeness" metric using hamming distance
         '''
-        responses = [{category: i+1 for i, category in enumerate(response)} for response in responses]
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         N = len(responses)
         
@@ -229,7 +225,7 @@ class RankEval(EvaluatorBasics):
         
         return tot / math.comb(N, 2)
     
-    def aggregate(self, responses: list[list[str]], metric: str='kendall', verbose: bool=False) -> float:
+    def aggregate(self, responses: list[dict[str, int]], metric: str='kendall', verbose: bool=False) -> float:
         '''
         Depending on what metric was specified in the constructor, choose which aggregator to use
 
