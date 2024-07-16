@@ -18,11 +18,13 @@ def run_20_simuls(model, explicit_country):
         dir_name = 'dummy'
     simulator = GameSimulator(model, 'rank', explicit_country, 20, 1.0)
     for i in tqdm(range(20), desc='Run simulations...'):
-        directory = f'logging/outputs/v3/{dir_name}'
+        o_directory = f'logging/outputs/v4/{dir_name}'
         f_name = f'run{i+1}'
 
-        outupts = simulator.run_basic()
-        simulator.write_outputs(outupts, directory, f_name=f_name)
+        outupts, chats = simulator.run_basic()
+        simulator.write_outputs(outupts, o_directory, f_name=f_name)
+    
+    simulator.write_chat(chats, f'logging/chats/v4/{dir_name}', 'chat')
 
 for perm in perms:
     run_20_simuls(perm[0], perm[1])

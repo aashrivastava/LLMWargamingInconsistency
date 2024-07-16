@@ -55,7 +55,7 @@ class GameSimulator:
             o_2 = ['text move 2' for i in range(self.N_responses)]
             responses.append(o_2)
         
-        return responses
+        return responses, curr_chat
     
     def write_outputs(self, outputs: list[list[str], list[str]], save_dir: str, f_name: str='outputs') -> None:
         '''

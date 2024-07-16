@@ -32,7 +32,7 @@ class ChatCreation:
         if self.control_level == 'free':
             file_to_use = 'system_free.txt'
         elif self.control_level == 'rank':
-            file_to_use = 'system_options_v3.txt'
+            file_to_use = 'system_options_v4.txt'
         elif self.control_level == 'nudge':
             file_to_use = 'system_nudge.txt'
         else:
@@ -99,7 +99,7 @@ class ChatCreation:
         elif self.control_level == 'nudge':
             question = 'question_nudge.txt'
         else:
-            question = 'question_options_v3.txt'
+            question = 'question_options_v4.txt'
 
         if self.explicit_country:
             replacement_file = 'replacement_explicit.json'
@@ -139,7 +139,7 @@ class ChatCreation:
         elif self.control_level == 'nudge':
             question = 'question_nudge.txt'
         else:
-            question = 'question_options_v3.txt'
+            question = 'question_options_v4.txt'
 
         if self.explicit_country:
             replacement_file = 'replacement_explicit.json'
@@ -168,11 +168,11 @@ class ChatCreation:
 if __name__ == '__main__':
     x = ChatCreation('rank', True)
     y = x.move_1()
-    print(y[0]['content'], y[1]['content'])
+    # print(y[0]['content'], y[1]['content'])
     # print('---------------------')
-    # x.move_2(y)
-    # for chat in y:
-    #     print(chat['content'])
+    x.move_2(y)
+    for chat in y:
+        print(chat['content'])
     
 
 
