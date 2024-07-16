@@ -5,8 +5,8 @@ import csv
 from utils.game import GameSimulator
 
 perms = [
-    ('gpt-3.5-turbo', False),
-    ('gpt-3.5-turbo', True)
+    ('gpt-4', False),
+    ('gpt-4', True)
 ]
 
 def run_20_simuls(model, explicit_country):
