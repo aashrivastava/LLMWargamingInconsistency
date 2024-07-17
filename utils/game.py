@@ -18,7 +18,7 @@ class GameSimulator:
         assert control_level.lower() in ['free', 'rank', 'nudge']
         self.model = model
         self.control_level = control_level
-        if self.control_level == 'rank':
+        if self.control_level == 'rank' or self.control_level == 'free':
             self.json_mode = False
         else:
             self.json_mode = True

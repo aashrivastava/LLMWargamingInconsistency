@@ -17,7 +17,8 @@ class Parser:
         rank_str = re.match(pattern, response).group(0).strip()
 
         rank_list = rank_str.split('\n')
-        
+
+        # figure out what to do in duplicate case
         return {rank[0]: int(re.findall(r'(\d+)', rank)[0]) for rank in rank_list}
 
 

@@ -30,7 +30,7 @@ class ChatCreation:
 
     def create_system_prompt(self):
         if self.control_level == 'free':
-            file_to_use = 'system_free.txt'
+            file_to_use = 'system_free_v4.txt'
         elif self.control_level == 'rank':
             file_to_use = 'system_options_v4.txt'
         elif self.control_level == 'nudge':
@@ -95,7 +95,7 @@ class ChatCreation:
         incident = 'incident_move1.txt'
 
         if self.control_level == 'free':
-            question = 'question_free.txt'
+            question = 'question_free_v4.txt'
         elif self.control_level == 'nudge':
             question = 'question_nudge.txt'
         else:
@@ -135,7 +135,7 @@ class ChatCreation:
         response = 'adversary_response.txt'
 
         if self.control_level == 'free':
-            question = 'question_free.txt'
+            question = 'question_free_v4.txt'
         elif self.control_level == 'nudge':
             question = 'question_nudge.txt'
         else:
@@ -166,7 +166,7 @@ class ChatCreation:
 
 
 if __name__ == '__main__':
-    x = ChatCreation('rank', True)
+    x = ChatCreation('free', False)
     y = x.move_1()
     # print(y[0]['content'], y[1]['content'])
     # print('---------------------')
