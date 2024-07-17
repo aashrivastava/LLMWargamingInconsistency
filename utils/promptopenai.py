@@ -48,7 +48,7 @@ class OpenAIPrompting:
         )
     
         
-    def get_completions(self, curr_chat: list[dict[str, str]], N_responses: int=20, temperature: int=1.0, json_mode: bool=True):
+    def get_completions(self, curr_chat: list[dict[str, str]], N_responses: int=20, temperature: float=1.0, json_mode: bool=False):
         '''
         ## TODO:
         ##  Implement **kwargs so that user can pass other things if they want beyond these explicit ones
@@ -94,42 +94,21 @@ class OpenAIPrompting:
         curr_chat.append({'role': greedy_decode.choices[0].message.role, 'content': greedy_decode.choices[0].message.content})
         return completions
     
-    def parse_outputs(self, response, control_level) -> list[str]:
+    def parse_outputs(self, completions) -> list[str]:
         '''
         Get list of strings which is just the text outputs of the chat completions given by openai api
 
         Inputs:
-            response:
-                Response given by openai api
+            completions:
+                completions given by openai api
         
         Output:
             list[str]: list of strings where each string is one text output of openai
         '''
         # use response.choices[i].message.content
-        responses = [completion_message.message.content for completion_message in response.choices]
+        responses = [completion_message.message.content for completion_message in completions.choices]
         # print(responses)
 
 
         return responses
     
-    def get_rankings(self, parsed_output: list[str]) -> dict[str, int]:
-        '''
-        Get dictionary where keys are action and int is the ranking of that action from chatcompletion given by
-        openai api.
-
-        Inputs:
-            parsed_output: list[str]
-                list of strings which is just the text outputs of the chat completions given by openai api
-        Output:
-            dict[str, int]: dictionary where keys are action and int is the ranking of that action from chatcompletion given by
-                            openai api.
-        '''
-        ranked_actions = parsed_output.split('\n')
-
-        rankings = {ranked_action: i + 1 for i, ranked_action in enumerate(ranked_actions)}
-        return rankings
-
-if __name__ == '__main__':
-    prompter = OpenAIPrompting(model='gpt-3.5-turbo')
-    response = prompter.create_context(False)
-    print(response)
