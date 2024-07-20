@@ -1,6 +1,6 @@
 import typing
 import torch
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from selfcheckgpt.modeling_mqag import MQAG as mqag
 from utils.EvalsBase import EvaluatorBasics 
 import math

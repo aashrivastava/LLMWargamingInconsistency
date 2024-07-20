@@ -1,6 +1,7 @@
 import csv
 import re
 import pandas as pd
+import typing
 
 class Parser:
     '''
@@ -33,7 +34,7 @@ class Parser:
 
         return rec_str
         
-    def parse_rankings(self, file: str) -> tuple(list[dict[str, int]]):
+    def parse_rankings(self, file: str) -> tuple[list[dict[str, int]]]:
         '''
         DOCSTRING
         '''
@@ -44,7 +45,7 @@ class Parser:
 
         return df.iloc[0].tolist(), df.iloc[1].tolist()
     
-    def parse_free(self, file: str) -> tuple(list[str]):
+    def parse_free(self, file: str) -> tuple[list[str]]:
         '''
         DOCSTRING
         '''

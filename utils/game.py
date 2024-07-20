@@ -1,4 +1,5 @@
 from utils.promptopenai import OpenAIPrompting
+from utils.promptanthropic import AnthropicPrompting
 from utils.createchats import ChatCreation
 from metrics.BERTScoreEval import BERTScoreEval
 from metrics.BiDirectionalEntailmentEval import BiDirectionalEntailmentEval
@@ -18,34 +19,62 @@ class GameSimulator:
         assert control_level.lower() in ['free', 'rank', 'nudge']
         self.model = model
         self.control_level = control_level
-        if self.control_level == 'rank' or self.control_level == 'free':
-            self.json_mode = False
-        else:
-            self.json_mode = True
         self.explicit_country = explicit_country
         self.N_responses = N_responses
         self.temperature = temperature
         self.chatcreator = ChatCreation(self.control_level, self.explicit_country)
-        if self.model != 'dummy':
+        if self.model != 'dummy' and self.model in ['gpt-3.5-turbo', 'gpt-4']:
             self.prompter = OpenAIPrompting(model=self.model)
+        elif self.model != 'dummy' and self.model in ['claude-3-5-sonnet-20240620', 'claude-3-haiku-20240307']:
+            self.prompter = AnthropicPrompting(model=self.model)
         else:
             self.prompter = None
     
-    def run_basic(self):
+    def run_basic_oai(self):
+        assert self.model in ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo']
+
         responses = []
         first_prompt = self.chatcreator.move_1()
         curr_chat = first_prompt
 
         if self.prompter:
             print('Getting move 1 completions...')
-            move1_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature, json_mode=self.json_mode)
-            outputs_1 = self.prompter.parse_outputs(move1_completions, self.control_level)
+            move1_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature)
+            outputs_1 = self.prompter.parse_outputs(move1_completions)
             print('Got move 1 completions!')
             responses.append(outputs_1)
             self.chatcreator.move_2(curr_chat)
             print('Getting move 2 completions...')
-            move2_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature, json_mode=self.json_mode)
-            outputs_2 = self.prompter.parse_outputs(move2_completions, self.control_level)
+            move2_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature)
+            outputs_2 = self.prompter.parse_outputs(move2_completions)
+            print('Got move 2 completions!')
+            responses.append(outputs_2)
+        # dummy is running
+        else:
+            o_1 = ['text move 1' for i in range(self.N_responses)]
+            responses.append(o_1)
+            o_2 = ['text move 2' for i in range(self.N_responses)]
+            responses.append(o_2)
+        
+        return responses, curr_chat
+    
+    def run_basic_anthropic(self):
+        assert self.model in ['claude-3-5-sonnet-20240620', 'claude-3-haiku-20240307']
+
+        responses = []
+        first_prompt = self.chatcreator.move_1()
+        system_prompt, curr_chat = first_prompt[0]['content'], first_prompt[1:]
+
+        if self.prompter:
+            print('Getting move 1 completions...')
+            move1_completions = self.prompter.get_completions(system_prompt, curr_chat, N_responses=self.N_responses, temperature=self.temperature)
+            outputs_1 = self.prompter.parse_outputs(move1_completions)
+            print('Got move 1 completions!')
+            responses.append(outputs_1)
+            self.chatcreator.move_2(curr_chat)
+            print('Getting move 2 completions...')
+            move2_completions = self.prompter.get_completions(system_prompt, curr_chat, N_responses=self.N_responses, temperature=self.temperature)
+            outputs_2 = self.prompter.parse_outputs(move2_completions)
             print('Got move 2 completions!')
             responses.append(outputs_2)
         # dummy is running
@@ -81,7 +110,7 @@ class GameSimulator:
         # curr_chat should be updated with first response
         if self.prompter:
             print('Getting move 1 completions...')
-            move1_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature, json_mode=self.json_mode)
+            move1_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature)
             outputs = self.prompter.parse_outputs(move1_completions, self.control_level)
             print('Got move 1 completions')
             orders_move1 = []
@@ -132,7 +161,7 @@ class GameSimulator:
         self.chatcreator.move_2(curr_chat)
         if self.prompter:
             print('Getting move 2 completions...')
-            move2_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature, json_mode=self.json_mode)
+            move2_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature)
             outputs = self.prompter.parse_outputs(move2_completions, self.control_level)
             print('Got move 2 completions')
             orders_move2 = []

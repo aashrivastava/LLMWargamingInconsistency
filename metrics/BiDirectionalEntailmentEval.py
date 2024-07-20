@@ -2,7 +2,7 @@ import typing
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import torch.nn.functional
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import itertools
 from utils.EvalsBase import EvaluatorBasics
 
@@ -40,7 +40,7 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
             self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         else:
             self.device = torch.device('cpu')
-        self.tokenizer = AutoTokenizer.from_pretrained(model)
+        self.tokenizer = AutoTokenizer.from_pretrained(model, use_fast=False)
         self.model_name = model
         if self.model_name in ['microsoft/deberta-v2-xlarge-mnli', 'microsoft/deberta-large-mnli', 'microsoft/deberta-xlarge-mnli',\
                                'FacebookAI/roberta-large-mnli']:
@@ -72,6 +72,23 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
         probs = torch.nn.functional.softmax(logits, dim=1).data[0]
         
         return probs
+    
+    def entails_neutral_contradict(self, text1: str, text2: str) -> bool:
+        '''
+        DOCSTRING
+        '''
+        softmax_probs = self._get_probs(text1, text2)
+
+        argmax = torch.argmax(softmax_probs)
+
+        return argmax
+
+        # if argmax == 2:
+        #     return 2
+        # elif argmax == 1:
+        #     return 1
+        # else:
+        #     return 0
     
     def if_entails_neutral_contradict(self, text1: str, text2: str) -> bool:
         '''
@@ -133,13 +150,22 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
                 to_check = c[0]
                 # if to_check == response:
                 #     continue
+                good = False
                 if self.output_type == 'triple':
-                    if_entails1 = self.if_entails_neutral_contradict(response, to_check)
-                    if_entails2 = self.if_entails_neutral_contradict(to_check, response)
+                    # if_entails1 = self.if_entails_neutral_contradict(response, to_check)
+                    # if_entails2 = self.if_entails_neutral_contradict(to_check, response)
+                    direction1 = self.entails_neutral_contradict(response, to_check)
+                    direction2 = self.entails_neutral_contradict(to_check, response)
+                    if direction1 == 2 and direction2 > 0:
+                        good = True
+                    elif direction2 == 2 and direction1 > 0:
+                        good = True
                 else:
                     if_entails1 = self.if_entails_or_not(response, to_check)
                     if_entails2 = self.if_entails_or_not(to_check, response)
-                if if_entails1 and if_entails2:
+                    if if_entails1 and if_entails2:
+                        good = True
+                if good:
                     if to_check not in equivalence_classes:
                         c.append(response)
                     found_equivalence = True
@@ -171,13 +197,12 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
         return tot / (N ** 2 - N)
 
 if __name__ == '__main__':
-    evaluator = BiDirectionalEntailmentEval(model='potsawee/deberta-v3-large-mnli')
-    ref = 'I think we should go to the store'
-    contradict = 'I do not think we should go to the store'
-    neutral = 'The mercedes is a good car'
-    entails = 'I believe going to the store is a good idea'
-    responses = [ref, entails, contradict, neutral]
-    responses = ['Love.', 'love', 'unknown', 'Experience', 'Experience']
+    evaluator = BiDirectionalEntailmentEval(model='microsoft/deberta-v2-xlarge-mnli')
+    ref = 'I think we should go to the store and buy food'
+    cand = 'We should go to the store'
+    random_neutral = 'Mercedes Benz makes good cars'
+    cont = 'We should not go the store'
+    responses = [ref, cand, random_neutral, cont]
 
     score = evaluator.aggregate(responses, verbose=True)
     print(f'The unalikeness metric is: {score: .2f}')

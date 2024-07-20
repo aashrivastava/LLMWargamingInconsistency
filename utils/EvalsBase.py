@@ -40,5 +40,5 @@ class EvaluatorBasics:
 
 if __name__ == '__main__':
     create = EvaluatorBasics()
-    print(create.create_unique_pairs(['a', 'b', 'c', 'd', 'e', 'f']))
+    print(create.create_unique_pairs(['a', 'b', 'c', 'd']))
 
