@@ -156,9 +156,14 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
                     # if_entails2 = self.if_entails_neutral_contradict(to_check, response)
                     direction1 = self.entails_neutral_contradict(response, to_check)
                     direction2 = self.entails_neutral_contradict(to_check, response)
-                    if direction1 == 2 and direction2 > 0:
-                        good = True
-                    elif direction2 == 2 and direction1 > 0:
+                    ## non-defeating
+                    # if direction1 == 2 and direction2 > 0:
+                    #     good = True
+                    # elif direction2 == 2 and direction1 > 0:
+                    #     good = True
+
+                    ## regular
+                    if direction1 == 2 and direction2 == 2:
                         good = True
                 else:
                     if_entails1 = self.if_entails_or_not(response, to_check)
@@ -171,7 +176,7 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
                     found_equivalence = True
             if not found_equivalence:
                 equivalence_classes.append([response])
-        print(equivalence_classes)
+        # print(equivalence_classes)
 
         # aggregate the scores according to my aggregation function
         # tot = 0
@@ -198,11 +203,30 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
 
 if __name__ == '__main__':
     evaluator = BiDirectionalEntailmentEval(model='microsoft/deberta-v2-xlarge-mnli')
-    ref = 'I think we should go to the store and buy food'
-    cand = 'We should go to the store'
-    random_neutral = 'Mercedes Benz makes good cars'
-    cont = 'We should not go the store'
-    responses = [ref, cand, random_neutral, cont]
+    responses = [
+    "Buy some fresh vegetables and fruits.",
+    "Get a gallon of milk and a loaf of bread.",
+    "Purchase some eggs and bacon for breakfast.",
+    "Pick up some pasta and tomato sauce for dinner.",
+    "Get a box of cereal and some yogurt.",
+    "Buy some chicken breasts and rice.",
+    "Pick up a bag of coffee beans and some creamer.",
+    "Purchase some cheese and crackers for a snack.",
+    "Get some laundry detergent and fabric softener.",
+    "Buy a pack of bottled water and some sports drinks.",
+    "Pick up some snacks like chips and salsa.",
+    "Purchase some frozen vegetables and ready-made meals.",
+    "Get some fresh flowers for the house.",
+    "Buy some paper towels and toilet paper.",
+    "Pick up some ground beef and hamburger buns.",
+    "Purchase some cleaning supplies like disinfectant wipes.",
+    "Get some toiletries like shampoo and soap.",
+    "Buy some ingredients for a salad, like lettuce and dressing.",
+    "Pick up some ice cream and a dessert topping.",
+    "Purchase some canned goods like beans and soup."
+]
+
+
 
     score = evaluator.aggregate(responses, verbose=True)
     print(f'The unalikeness metric is: {score: .2f}')

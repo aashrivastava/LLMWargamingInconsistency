@@ -93,7 +93,9 @@ class RankEval(EvaluatorBasics):
         # rescale to [0, 1]
         tau = (tau + 1)/2
 
-        return tau
+        tau_reversed = 1 - tau
+
+        return tau_reversed
     
     def _aggregate_kendalls(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
         '''
@@ -119,7 +121,7 @@ class RankEval(EvaluatorBasics):
             curr_tau = self._kendalls_tau(r1, r2, verbose=verbose)
             # taus.append(curr_tau)
             # one_minus_taus.append(1 - curr_tau)
-            tot += (1 - curr_tau)
+            tot += curr_tau
         
         
         return tot / math.comb(N, 2)
@@ -150,7 +152,10 @@ class RankEval(EvaluatorBasics):
             sum_diffs += (rank1[cat] - rank2[cat])**2
         
         # linearly normalized into [0,1] instead of [-1, 1]
-        return (2 - ((6 * sum_diffs)/(n*(n**2 - 1))))/2
+        rho = (2 - ((6 * sum_diffs)/(n*(n**2 - 1))))/2
+        rho_reversed = 1 - rho
+
+        return rho_reversed
     
     def _aggregate_spearmans(self, responses: list[dict[str, int]], verbose: bool=False) -> float:
         '''
@@ -172,7 +177,8 @@ class RankEval(EvaluatorBasics):
         # aggregator according to formula seen in paper
         tot = 0
         for r1, r2 in tqdm(pairs, desc='Calculating RankEval using Spearman\'s Rank Coefficient...', disable=not verbose):
-            tot += (1 - self._spearmans_coef(r1, r2, verbose=verbose))
+            curr_rho = self._spearmans_coef(r1, r2, verbose=verbose)
+            tot += curr_rho
         
         return tot / math.comb(N, 2)
     
@@ -225,6 +231,43 @@ class RankEval(EvaluatorBasics):
         
         return tot / math.comb(N, 2)
     
+    def get_kendalls(self, responses: list[dict[str, int]], verbose: bool=False) -> list[float]:
+        '''
+        DOCSTRING
+        '''
+        result = []
+
+        pairs = self.create_unique_pairs(responses, verbose=verbose)
+
+        for r1, r2 in tqdm(pairs, desc='Getting Kendalls for Responses...', disable=not verbose):
+            result.append(self._kendalls_tau(r1, r2, verbose=verbose))
+        
+        return result
+    
+    def get_spearmans(self, responses: list[dict[str, int]], verbose: bool=False) -> list[float]:
+        '''
+        DOCSTRING
+        '''
+        result = []
+        pairs = self.create_unique_pairs(responses, verbose=verbose)
+
+        for r1, r2 in tqdm(pairs, desc='Getting Spearmans for Responses...', disable=not verbose):
+            result.append(self._spearmans_coef(r1, r2, verbose=verbose))
+        
+        return result
+    
+    def get_hamming(self, responses: list[dict[str, int]], verbose: bool=False) -> list[float]:
+        '''
+        DOCSTRING
+        '''
+        result = []
+        pairs = self.create_unique_pairs(responses, verbose=verbose)
+
+        for r1, r2 in tqdm(pairs, desc='Getting Hammings for Responses...', disable=not verbose):
+            result.append(self._hamming_distance(r1, r2, verbose=verbose))
+        
+        return result
+
     def aggregate(self, responses: list[dict[str, int]], metric: str='kendall', verbose: bool=False) -> float:
         '''
         Depending on what metric was specified in the constructor, choose which aggregator to use

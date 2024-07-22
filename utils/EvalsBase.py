@@ -1,5 +1,6 @@
 import typing
 import numpy as np
+import math
 from tqdm import tqdm
 
 ## WHAT TO DO FOR LATER/TOMORROW
@@ -36,9 +37,10 @@ class EvaluatorBasics:
         DOCSTRING
         '''
         unique_pairs = [(response_i, responses[j]) for i, response_i in tqdm(enumerate(responses), desc='Creating Pairs...', disable=not verbose) for j in range(i+1, len(responses))]
+
         return unique_pairs
 
 if __name__ == '__main__':
     create = EvaluatorBasics()
-    print(create.create_unique_pairs(['a', 'b', 'c', 'd']))
+    print(create.create_unique_pairs(['a']))
 
