@@ -31,8 +31,22 @@ class BERTScoreEval(EvaluatorBasics):
             self.device = torch.device('cpu')
         super().__init__()
         print(f'BERTScore Evaluator Initialized to {self.device}') # probably replace print with logging
+    
+    def get_berts(self, responses: list[str], verbose: bool = False) -> list[float]:
+        '''
+        DOCSTRING
+        '''
+        result = []
 
-    def aggregate(self, responses: list[str], verbose: bool = False, **kwargs) -> int:
+        pairs = self.create_unique_pairs(responses, verbose=verbose)
+        for t1, t2 in tqdm(pairs, desc='Getting BERTScores', disable=not verbose):
+            P, R, F1 = self.scorer.score([t1], [t2])
+
+            result.append(1 - F1.item())
+        
+        return result
+
+    def aggregate(self, responses: list[str], verbose: bool = False, **kwargs) -> float:
         '''
         Given a list of N responses, generate the "unalikeness" metric using BERTScore.
 

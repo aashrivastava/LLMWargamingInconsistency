@@ -154,17 +154,19 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
                 if self.output_type == 'triple':
                     # if_entails1 = self.if_entails_neutral_contradict(response, to_check)
                     # if_entails2 = self.if_entails_neutral_contradict(to_check, response)
+
                     direction1 = self.entails_neutral_contradict(response, to_check)
                     direction2 = self.entails_neutral_contradict(to_check, response)
-                    ## non-defeating
-                    # if direction1 == 2 and direction2 > 0:
-                    #     good = True
-                    # elif direction2 == 2 and direction1 > 0:
+                    
+                    ### REGULAR
+                    # if direction1 == 2 and direction2 == 2:
                     #     good = True
 
-                    ## regular
-                    if direction1 == 2 and direction2 == 2:
+                    ## NON DEFEATING
+                    if direction1 == 2 and direction2 > 0:
                         good = True
+                    elif direction2 == 2 and direction1 > 0:
+                        good = Trueå
                 else:
                     if_entails1 = self.if_entails_or_not(response, to_check)
                     if_entails2 = self.if_entails_or_not(to_check, response)
