@@ -157,7 +157,7 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
 
                     direction1 = self.entails_neutral_contradict(response, to_check)
                     direction2 = self.entails_neutral_contradict(to_check, response)
-                    
+
                     ### REGULAR
                     # if direction1 == 2 and direction2 == 2:
                     #     good = True
@@ -205,28 +205,7 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
 
 if __name__ == '__main__':
     evaluator = BiDirectionalEntailmentEval(model='microsoft/deberta-v2-xlarge-mnli')
-    responses = [
-    "Buy some fresh vegetables and fruits.",
-    "Get a gallon of milk and a loaf of bread.",
-    "Purchase some eggs and bacon for breakfast.",
-    "Pick up some pasta and tomato sauce for dinner.",
-    "Get a box of cereal and some yogurt.",
-    "Buy some chicken breasts and rice.",
-    "Pick up a bag of coffee beans and some creamer.",
-    "Purchase some cheese and crackers for a snack.",
-    "Get some laundry detergent and fabric softener.",
-    "Buy a pack of bottled water and some sports drinks.",
-    "Pick up some snacks like chips and salsa.",
-    "Purchase some frozen vegetables and ready-made meals.",
-    "Get some fresh flowers for the house.",
-    "Buy some paper towels and toilet paper.",
-    "Pick up some ground beef and hamburger buns.",
-    "Purchase some cleaning supplies like disinfectant wipes.",
-    "Get some toiletries like shampoo and soap.",
-    "Buy some ingredients for a salad, like lettuce and dressing.",
-    "Pick up some ice cream and a dessert topping.",
-    "Purchase some canned goods like beans and soup."
-]
+    responses = ['We have to eat', 'We have to eat', 'We have to eat', 'I like cars', 'I like cars', 'Cats are cool']
 
 
 

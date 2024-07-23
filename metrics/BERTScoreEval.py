@@ -87,7 +87,7 @@ if __name__ == '__main__':
     contradict = 'I do not think we should go to the store. The mercedes is a good car.'
     neutral = 'The mercedes is a good car'
     entails = 'I believe going to the store is a good idea'
-    responses = [ref, entails, contradict, neutral]
+    responses = ['ref, entails, contradict, neutral']
     # responses =['Love.', 'love', 'unknown', 'Experience', 'Experience']
     print(f'Unalikeness score: {evaluator.aggregate([ref, x], verbose=False)}')
 
