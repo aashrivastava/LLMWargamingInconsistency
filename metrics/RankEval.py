@@ -25,6 +25,10 @@ class RankEval(EvaluatorBasics):
     def make_assertions(self, rank1: dict[str, int], rank2: dict[str, int]) -> None:
         '''
         Asserts that the rankings to compare have same size and rank the same categories
+
+        Inputs:
+            rank1, rank2: dict[str, int]
+                Keys are the category and the value is its associated rank
         '''
         assert len(rank1) == len(rank2)
         assert rank1.keys() == rank2.keys()
@@ -53,7 +57,7 @@ class RankEval(EvaluatorBasics):
 
     def _kendalls_tau(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False) -> float:
         '''
-        Calculates kendall's tau between two rankings. Rescaled from [-1, 1] to [0, 1]
+        Calculates rescaled 1 -kendall's tau between two rankings. Rescaled from [-1, 1] to [0, 1]
 
         Inputs:
             rank1: dict[str, int]
@@ -130,7 +134,7 @@ class RankEval(EvaluatorBasics):
     
     def _spearmans_coef(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False) -> float:
         '''
-        Calculates spearman's rank coefficient between two rankings. Rescaled from [-1, 1] to [0, 1]
+        Calculates rescaled 1- spearman's rank coefficient between two rankings. Rescaled from [-1, 1] to [0, 1]
 
         Inputs:
             rank1: dict[str, int]
@@ -185,8 +189,7 @@ class RankEval(EvaluatorBasics):
     
     def _hamming_distance(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False) -> float:
         '''
-        Calculates Hamming distance between two rankings. Simply counts how many differences in rankings there are.
-        I divide by the number of categories to rescale to a number between [0,1]
+        Calculates rescaled Hamming distance between two rankings. Simply counts how many differences in rankings there are.
 
         Inputs:
             rank1: dict[str, int]
@@ -234,7 +237,16 @@ class RankEval(EvaluatorBasics):
     
     def get_kendalls(self, responses: list[dict[str, int]], verbose: bool=False) -> list[float]:
         '''
-        DOCSTRING
+        Get a list of all rescaled 1 - kendall's tau for each pair of rankings in responses
+
+        Inputs:
+            responses: list[dict[str, int]]
+                list of rankings
+            verbose: bool
+                Indicates whether you want progress bar to show
+        
+        Output: list[float]
+            List containing all taus
         '''
         result = []
 
@@ -247,7 +259,16 @@ class RankEval(EvaluatorBasics):
     
     def get_spearmans(self, responses: list[dict[str, int]], verbose: bool=False) -> list[float]:
         '''
-        DOCSTRING
+        Get a list of all rescaled 1 - spearman's for each pair of rankings in responses
+
+        Inputs:
+            responses: list[dict[str, int]]
+                list of rankings
+            verbose: bool
+                Indicates whether you want progress bar to show
+        
+        Output: list[float]
+            List containing spearmans 
         '''
         result = []
         pairs = self.create_unique_pairs(responses, verbose=verbose)
@@ -259,7 +280,16 @@ class RankEval(EvaluatorBasics):
     
     def get_hamming(self, responses: list[dict[str, int]], verbose: bool=False) -> list[float]:
         '''
-        DOCSTRING
+        Get a list of all rescaled hamming distance for each pair of rankings in responses
+
+        Inputs:
+            responses: list[dict[str, int]]
+                list of rankings
+            verbose: bool
+                Indicates whether you want progress bar to show
+        
+        Output: list[float]
+            List containing all hamming
         '''
         result = []
         pairs = self.create_unique_pairs(responses, verbose=verbose)
@@ -271,7 +301,18 @@ class RankEval(EvaluatorBasics):
     
     def get_metric_across(self, ranks1: list[dict[str, int]], ranks2: list[dict[str, int]], metric: str='kendall'):
         '''
-        DOCSTRING
+        Given two sets of rankings, get a matrix that contains all the inconsistency scores between each pair
+
+        Inputs:
+            ranks1: list[dict[str, int]]
+                set of rankings
+            ranks2: list[dict[str, int]]
+                set of rankings
+            metric: str
+                metric to use
+        
+        Output: np.ndarray
+            matrix containing the inconsistency scores between each pair
         '''
         assert metric in ['kendall', 'spearman', 'hamming']
 
