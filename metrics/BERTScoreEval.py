@@ -7,6 +7,7 @@ from tqdm.auto import tqdm # progress bar
 from utils.EvalsBase import EvaluatorBasics
 from utils.promptopenai import OpenAIPrompting
 import math
+import numpy as np
 
 ## WHAT TO DO FOR LATER/TOMORROW
 ## ___PRESSING___
@@ -32,7 +33,15 @@ class BERTScoreEval(EvaluatorBasics):
         super().__init__()
         print(f'BERTScore Evaluator Initialized to {self.device}') # probably replace print with logging
     
-    def get_berts(self, responses: list[str], verbose: bool = False) -> list[float]:
+    def get_single_score(self, r1: str, r2: str) -> float:
+        '''
+        DOCSTRING
+        '''
+        P, R, F1 = self.scorer.score([r1], [r2])
+
+        return 1 - F1.item()
+
+    def get_berts_within(self, responses: list[str], verbose: bool = False) -> list[float]:
         '''
         DOCSTRING
         '''
@@ -45,6 +54,18 @@ class BERTScoreEval(EvaluatorBasics):
             result.append(1 - F1.item())
         
         return result
+    
+    def get_berts_across(self, responses1: list[str], responses2: list[str], verbose: bool=False):
+        '''
+        DOCSTRING
+        '''
+        grid1, grid2 = np.meshgrid(responses1, responses2, indexing='ij')
+
+        v_func = np.vectorize(get_single_score)
+
+        return v_func(grid2, grid1)
+
+
 
     def aggregate(self, responses: list[str], verbose: bool = False, **kwargs) -> float:
         '''
@@ -73,8 +94,13 @@ class BERTScoreEval(EvaluatorBasics):
 
             tot += (1 - F1.item()) 
         
-        # taking the minimum because it might be that bertscore gives something slightly larger than 1
-        return min(tot / math.comb(N, 2), 1.0)
+        # return 0 if we get a negative 1 - bert score for whatever reason
+        if tot < 0:
+            return 0
+         # taking the minimum because it might be that bertscore gives something slightly larger than 1
+        else:
+            return min(tot / math.comb(N, 2), 1.0)
+    
     
 # for my purposes 
 if __name__ == '__main__':
@@ -82,13 +108,15 @@ if __name__ == '__main__':
     # to test
     # 
     # ref = 'I want to drive a Mercedes Benz. I also think we should go take down their communications'
-    x = 'Hi my name is Aryan'
-    ref = 'Hi my name is Aryan'
-    contradict = 'I do not think we should go to the store. The mercedes is a good car.'
-    neutral = 'The mercedes is a good car'
-    entails = 'I believe going to the store is a good idea'
-    responses = ['ref, entails, contradict, neutral']
-    # responses =['Love.', 'love', 'unknown', 'Experience', 'Experience']
-    print(f'Unalikeness score: {evaluator.aggregate([ref, x], verbose=False)}')
+    a1 = 'we should nuke china'
+    a2 = 'we should invade china'
+    a3 = 'taiwan needs help'
+    exps = [a1, a2, a3]
+    e1 = 'we should nuke gray'
+    e2 = 'we should invade gray'
+    e3 = 'pink needs help'
+    anons = [e1, e2, e3]
+
+    print(evaluator.get_berts_across(anons, exps))
 
     

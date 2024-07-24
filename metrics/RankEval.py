@@ -3,6 +3,7 @@ from tqdm import tqdm
 import math
 from utils.EvalsBase import EvaluatorBasics
 import random
+import numpy as np
 
 ## WHAT TO DO FOR LATER/TOMORROW
 ## ___PRESSING___
@@ -267,10 +268,28 @@ class RankEval(EvaluatorBasics):
             result.append(self._hamming_distance(r1, r2, verbose=verbose))
         
         return result
+    
+    def get_metric_across(self, ranks1: list[dict[str, int]], ranks2: list[dict[str, int]], metric: str='kendall'):
+        '''
+        DOCSTRING
+        '''
+        assert metric in ['kendall', 'spearman', 'hamming']
+
+        grid1, grid2 = np.meshgrid(ranks1, ranks2, indexing='ij')
+
+        if metric == 'kendall':
+            v = np.vectorize(self._kendalls_tau)
+        elif metric == 'spearman':
+            v = np.vectorize(self._spearmans_coef)
+            # v = np.vectorize(lambda x, y: (x, y))
+        else:
+            v = np.vectorize(self._hamming_distance)
+        
+        return v(grid2, grid1)
 
     def aggregate(self, responses: list[dict[str, int]], metric: str='kendall', verbose: bool=False) -> float:
         '''
-        Depending on what metric was specified in the constructor, choose which aggregator to use
+        Get inconsistency metric based on specified metric
 
         Inputs:
             responses: list[str]
@@ -293,12 +312,21 @@ class RankEval(EvaluatorBasics):
         
 if __name__ == '__main__':
     rank1 = ['a', 'b', 'c', 'd']
-    rank2 = ['a', 'b', 'c', 'd']
+    rank2 = ['a', 'b', 'd', 'c']
     rank3 = ['d', 'c', 'b','a']
 
-    rankings = [rank1, rank3]
-    print(rankings)
+    rank3_dict = {c: i+1 for i, c in enumerate(rank3)}
+
+    ranks1 = [{c: i+1 for i, c in enumerate(r)} for r in [rank1, rank2, rank3]]
+    
+    r1 = ['c', 'b', 'd', 'a']
+    r2 = ['a', 'b', 'c', 'd']
+    r3 = ['b', 'a', 'd', 'c']
+    ranks2 = [{c: i+1 for i, c in enumerate(r)} for r in [r1, r2, r3]]
+
+    r2_dict = {c: i+1 for i, c in enumerate(r2)}
 
     evaluator = RankEval()
-    print(f'Kendall: {evaluator.aggregate(rankings, metric='spearman')}')
+    print(evaluator.get_metric_across(ranks1, ranks2, metric='spearman'))
+    print(evaluator._spearmans_coef(rank3_dict, r2_dict))
 
