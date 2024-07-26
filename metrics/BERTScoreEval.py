@@ -78,8 +78,9 @@ class BERTScoreEval(EvaluatorBasics):
         DOCSTRING
         '''
         grid1, grid2 = np.meshgrid(responses1, responses2, indexing='ij')
+        print('done')
 
-        v_func = np.vectorize(get_single_score)
+        v_func = np.vectorize(self.get_single_score)
 
         return v_func(grid2, grid1)
 
