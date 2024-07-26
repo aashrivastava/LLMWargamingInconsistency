@@ -2,7 +2,7 @@ import numpy as np
 
 def bootstrap(dataset: list[float], n: int=1000):
     '''
-    Given a dataset of inconsistency metrics, boostrap to get a uncertainty in estimator
+    Given a dataset of inconsistency metrics, boostrap to get uncertainty in estimator
 
     Input:
         dataset: list[float]
@@ -16,6 +16,8 @@ def bootstrap(dataset: list[float], n: int=1000):
         means.append(np.mean(curr_dataset))
     
     return means
+
+
 
 '''
 PSEUDOCODE:

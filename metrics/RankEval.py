@@ -299,6 +299,37 @@ class RankEval(EvaluatorBasics):
         
         return result
     
+    def get_metric_within(self, responses: list[dict[str, int]], metric: str='kendall', verbose: bool = False) -> list[float]:
+        '''
+        Given a set of responses, get a list of the individual dis-similarities between all pairs
+
+        Inputs:
+            responses: list[str]
+                Set of responses
+            metric: str
+                Denotes which metric out of kendall, spearman, or hamming you want to use
+            verbose: bool
+                Denotes whether you want progress bar to show
+        
+        Output: list[float]
+            list of dis-similarities based on BERTScore
+        '''
+        result = []
+
+        pairs = self.create_unique_pairs(responses, verbose=verbose)
+        for r1, r2 in tqdm(pairs, desc='Getting BERTScores', disable=not verbose):
+            if metric == 'kendall':
+                score = self._kendalls_tau(r1, r2)
+            elif metric == 'spearman':
+                score = self._spearmans_coef(r1, r2)
+            else:
+                score = self._hamming_distance(r1, r2)
+
+
+            result.append(score)
+        
+        return result
+    
     def get_metric_across(self, ranks1: list[dict[str, int]], ranks2: list[dict[str, int]], metric: str='kendall'):
         '''
         Given two sets of rankings, get a matrix that contains all the inconsistency scores between each pair
@@ -322,7 +353,6 @@ class RankEval(EvaluatorBasics):
             v = np.vectorize(self._kendalls_tau)
         elif metric == 'spearman':
             v = np.vectorize(self._spearmans_coef)
-            # v = np.vectorize(lambda x, y: (x, y))
         else:
             v = np.vectorize(self._hamming_distance)
         

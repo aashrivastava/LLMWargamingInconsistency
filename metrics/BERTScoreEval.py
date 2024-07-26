@@ -35,7 +35,16 @@ class BERTScoreEval(EvaluatorBasics):
     
     def get_single_score(self, r1: str, r2: str) -> float:
         '''
-        DOCSTRING
+        Return the BERTScore dis-similarity between 2 strings
+
+        Inputs:
+            r1: str
+                One string
+            r2: str
+                Other string
+        
+        Output: float
+            Dis-similarity score based on BERTScore
         '''
         P, R, F1 = self.scorer.score([r1], [r2])
 
@@ -43,15 +52,24 @@ class BERTScoreEval(EvaluatorBasics):
 
     def get_berts_within(self, responses: list[str], verbose: bool = False) -> list[float]:
         '''
-        DOCSTRING
+        Given a set of responses, get a list of the individual dis-similarities between all pairs
+
+        Inputs:
+            responses: list[str]
+                Set of responses
+            verbose: bool
+                Denotes whether you want progress bar to show
+        
+        Output: list[float]
+            list of dis-similarities based on BERTScore
         '''
         result = []
 
         pairs = self.create_unique_pairs(responses, verbose=verbose)
         for t1, t2 in tqdm(pairs, desc='Getting BERTScores', disable=not verbose):
-            P, R, F1 = self.scorer.score([t1], [t2])
+            score = self.get_single_score(t1, t2)
 
-            result.append(1 - F1.item())
+            result.append(score)
         
         return result
     
