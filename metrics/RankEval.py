@@ -253,7 +253,13 @@ class RankEval(EvaluatorBasics):
         pairs = self.create_unique_pairs(responses, verbose=verbose)
 
         for r1, r2 in tqdm(pairs, desc='Getting Kendalls for Responses...', disable=not verbose):
-            result.append(self._kendalls_tau(r1, r2, verbose=verbose))
+            try:
+                result.append(self._kendalls_tau(r1, r2, verbose=verbose))
+            except:
+                print(r1)
+                print('---------')
+                print(r2['I'])
+                raise
         
         return result
     

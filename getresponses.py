@@ -43,10 +43,14 @@ def run_20_simuls_free(model, explicit_country, start, end):
     else:
         model_dir_name = 'dummy'
         dir_name = 'dummy'
+    if not explicit_country:
+        fixed = '_fixed'
+    else:
+        fixed = ''
     simulator = GameSimulator(model, 'free', explicit_country, 20, 1.0)
     for i in tqdm(range(start, end), desc='Run simulations...'):
         o_directory = f'logging/outputs/v4/{dir_name}'
-        f_name = f'run{i+1}_fixed'
+        f_name = f'run{i+1}{fixed}'
 
         if 'claude' in model:
             outputs, chats = simulator.run_basic_anthropic()
@@ -59,4 +63,4 @@ def run_20_simuls_free(model, explicit_country, start, end):
 
 perm = ('claude-3-5-sonnet-20240620', False)
 
-run_20_simuls_rank(perm[0], perm[1], 9, 20)
+run_20_simuls_free(perm[0], perm[1], 1, 20)

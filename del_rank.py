@@ -16,7 +16,7 @@ reval = RankEval()
 #     else:
 #         return 0
 
-def get_all(responses: list[dict[str, int]], verbose=True):
+def get_all(responses: list[dict[str, int]], verbose=False):
 
     k = reval.get_kendalls(responses, verbose=verbose)
     s = reval.get_spearmans(responses, verbose=verbose)
