@@ -32,7 +32,7 @@ paths = [
 for path in paths:
     if 'False' in path:
         file_end = '_fixed'
-        start = 4
+        start = 7
     else:
         file_end = ''
         start = 1
