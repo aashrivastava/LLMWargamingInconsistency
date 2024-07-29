@@ -1,62 +1,85 @@
-from main import Pipeline
+import os
+from metrics.BERTScoreEval import BERTScoreEval
+from metrics.BiDirectionalEntailmentEval import BiDirectionalEntailmentEval
+from utils.parse_csv import Parser
 from tqdm.auto import tqdm
-import re
-import csv
-from utils.game import GameSimulator
+import numpy as np
+import time
 
-perms = [
-    ('gpt-3.5-turbo', False),
-    ('gpt-4', False),
+parser = Parser()
+beval = BERTScoreEval()
+bieval = BiDirectionalEntailmentEval()
+
+# def check_bi(t1, t2):
+#     d1 = bieval.entails_neutral_contradict(t1, t2)
+#     d2 = bieval.entails_neutral_contradict(t2, t1)
+
+#     if (d1 == 2 and d2 >= 0) or (d2 == 2 and d1 >= 0):
+#         return 1
+#     else:
+#         return 0
+
+def get_both(responses: list[str], verbose=True):
+    result = [[], []]
+    pairs = beval.create_unique_pairs(responses)
+
+
+    for t1, t2 in tqdm(pairs, desc='Getting arrays...', disable=not verbose):
+        bert = beval.get_single_score(t1, t2)
+        d1 = bieval.entails_neutral_contradict(t1, t2)
+        d2 = bieval.entails_neutral_contradict(t2, t1)
+
+        if (d1 == 2 and d2 >= 0) or (d2 == 2 and d1 >= 0):
+            bi = 1
+        else:
+            bi = 0
+        result[0].append(bert)
+        result[1].append(bi)
+    
+    return result[0], result[1]
+
+
+paths = ['/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt3.5turbo-free-False-20-1.0',
+    '/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt3.5turbo-free-True-20-1.0',
+    '/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4-free-False-20-1.0',
+    '/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4-free-True-20-1.0'
 ]
 
-def run_20_simuls_rank(model, explicit_country, start, end):
-    if model != 'dummy' and 'claude' in model:
-        model_dir_name = re.sub(r'-', '', model)[:-8]
-        dir_name = f'{model_dir_name}-rank-{explicit_country}-20-1.0'
-    elif model != 'dummy' and 'gpt' in model:
-        model_dir_name = re.sub(r'-', '', model)
-        dir_name = f'{model_dir_name}-rank-{explicit_country}-20-1.0'
+for path in paths:
+    if path == '/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt3.5turbo-free-False-20-1.0':
+        start = 4
     else:
-        model_dir_name = 'dummy'
-        dir_name = 'dummy'
-    simulator = GameSimulator(model, 'rank', explicit_country, 20, 1.0)
-    for i in tqdm(range(start, end), desc='Run simulations...'):
-        o_directory = f'logging/outputs/v4/{dir_name}'
-        f_name = f'run{i+1}_fixed'
+        start = 1
 
-        if 'claude' in model:
-            outputs, chats = simulator.run_basic_anthropic()
-            simulator.write_outputs(outputs, o_directory, f_name=f_name)
-        elif 'gpt' in model:
-            outputs, chats = simulator.run_basic_oai()
-            simulator.write_outputs(outputs, o_directory, f_name=f_name)
-    
-    simulator.write_chat(chats, f'logging/chats/v4/{dir_name}', 'chat_fixed')
-
-def run_20_simuls_free(model, explicit_country, start, end):
-    if model != 'dummy' and 'claude' in model:
-        model_dir_name = re.sub(r'-', '', model)[:-8]
-        dir_name = f'{model_dir_name}-free-{explicit_country}-20-1.0'
-    elif model != 'dummy' and 'gpt' in model:
-        model_dir_name = re.sub(r'-', '', model)
-        dir_name = f'{model_dir_name}-free-{explicit_country}-20-1.0'
+    if 'False' in path:
+        file_end = '_fixed'
     else:
-        model_dir_name = 'dummy'
-        dir_name = 'dummy'
-    simulator = GameSimulator(model, 'free', explicit_country, 20, 1.0)
-    for i in tqdm(range(start, end), desc='Run simulations...'):
-        o_directory = f'logging/outputs/v4/{dir_name}'
-        f_name = f'run{i+1}_fixed'
+        file_end = ''
+    for i in range(start,21):
+        os.makedirs(f'{path}/run{i}_fixed', exist_ok=True)
+        m1, m2 = parser.parse_free(f'{path}/run{i}{file_end}.csv')
+        print('done parsing')
 
-        if 'claude' in model:
-            outputs, chats = simulator.run_basic_anthropic()
-            simulator.write_outputs(outputs, o_directory, f_name=f_name)
-        elif 'gpt' in model:
-            outputs, chats = simulator.run_basic_oai()
-            simulator.write_outputs(outputs, o_directory, f_name=f_name)
-    
-    simulator.write_chat(chats, f'logging/chats/v4/{dir_name}', 'chat_fixed')
+        # t0 = time.time()
+        berts1, bis1 = get_both(m1)
+        berts1 = np.array(berts1)
+        bis1 = np.array(bis1)
+        print('Done Move 1')
+        # t1 = time.time()
+        # print(f'Elapsed time: {t1 - t0:.2f} seconds')
+        
+        # t0 = time.time()
+        berts2, bis2 = get_both(m2)
+        berts2 = np.array(berts2)
+        bis2 = np.array(bis2)
+        print('Done Move 2')
+        # t1 = time.time()
+        # print(f'Elapsed time: {t1 - t0:.2f} seconds')
 
-perm = ('claude-3-5-sonnet-20240620', False)
+        np.save(f'{path}/run{i}_fixed/bert_move1.npy', berts1)
+        np.save(f'{path}/run{i}_fixed/bert_move2.npy', berts2)
+        np.save(f'{path}/run{i}_fixed/bidir_move1.npy', bis1)
+        np.save(f'{path}/run{i}_fixed/bidir_move2.npy', bis2)
+        print(f'Done: run{i}')
 
-run_20_simuls_rank(perm[0], perm[1], 9, 20)
+    print('--------------DONE ONE WHOLE MODEL--------------')

@@ -102,11 +102,19 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
                 Does text1 entail text2?
         
         Output:
-            bool: indication of whether text1 entails text2
+            1 if entails, 0 if neutral, -1 if contradict
         '''
         softmax_probs = self._get_probs(text1, text2)
 
-        return True if torch.argmax(softmax_probs) == 2 else False
+        idx = torch.argmax(softmax_probs)
+
+        if idx == 2:
+            return 1
+        if idx == 1:
+            return 0
+        if idx == 0:
+            return -1
+        # return True if torch.argmax(softmax_probs) == 2 else False
     
     def if_entails_or_not(self, text1: str, text2: str) -> bool:
         '''
