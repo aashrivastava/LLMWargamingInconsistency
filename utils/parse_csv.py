@@ -17,10 +17,13 @@ class Parser:
         pattern = r'(?s).+(?=REASONING)'
         rank_str = re.match(pattern, response).group(0).strip()
 
-        rank_list = rank_str.split('\n')
+        rank_list = re.split(r'\n+', rank_str)
 
         # figure out what to do in duplicate case
-        return {rank[0]: int(re.findall(r'(\d+)', rank)[0]) for rank in rank_list}
+        try:
+            return {rank[0]: int(re.findall(r'(\d+)', rank)[0]) for rank in rank_list}
+        except:
+            print('GOT ERROR!')
     
     def get_free(self, response: str) -> str:
         '''
@@ -57,7 +60,6 @@ class Parser:
 
 if __name__ == '__main__':
     parser = Parser()
-    parsed = parser.parse_free('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4-free-True-20-1.0/run20.csv')
-    for p in parsed:
-        print(p[0])
+    parsed = parser.parse_rankings('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4-rank-False-20-1.0/run4_fixed.csv')
+    print(parsed[0][5])
     
