@@ -63,4 +63,4 @@ def run_20_simuls_free(model, explicit_country, start, end):
 
 perm = ('claude-3-5-sonnet-20240620', True)
 
-run_20_simuls_free(perm[0], perm[1], 0, 20)
+run_20_simuls_free(perm[0], perm[1], 12, 20)
