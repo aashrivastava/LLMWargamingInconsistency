@@ -338,7 +338,8 @@ class RankEval(EvaluatorBasics):
     
     def get_metric_across(self, ranks1: list[dict[str, int]], ranks2: list[dict[str, int]], metric: str='kendall'):
         '''
-        Given two sets of rankings, get a matrix that contains all the inconsistency scores between each pair
+        Given two sets of rankings, get a matrix that contains all the inconsistency scores between each pair.
+        ranks1 is on y axis, rank2 on x axis
 
         Inputs:
             ranks1: list[dict[str, int]]
