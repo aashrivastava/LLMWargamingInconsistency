@@ -146,12 +146,10 @@ if __name__ == '__main__':
     sent3 = "The loud clanging of pots in the bustling kitchen created a sense of chaos in the crowded restaurant."
 
 
-    refs = [sent2, sent3]
-    cands = [sent] * len(refs)
-    print(cands)
+    refs = [sent, sent2, sent3]
     
     start =  time.time()
-    _, _, F1_1 = evaluator.scorer.score(cands, refs)
+    F1_1 = evaluator.get_berts_within(refs)
     end = time.time()
 
     print(f'{F1_1}: Completed in {end-start:.2f} seconds')

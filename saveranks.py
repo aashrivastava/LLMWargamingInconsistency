@@ -30,45 +30,5 @@ paths = [
 ]
 
 for path in paths:
-    if 'False' in path:
-        file_end = '_fixed'
-        start = 7
-    else:
-        file_end = ''
-        start = 1
-    for i in range(start,21):
-        os.makedirs(f'{path}/run{i}_fixed', exist_ok=True)
-        try:
-            m1, m2 = parser.parse_rankings(f'{path}/run{i}{file_end}.csv')
-        except Exception as e:
-            print(e, i, path)
-            break
-        print('done parsing')
-
-        # t0 = time.time()
-        k1, s1, h1 = get_all(m1)
-        k1 = np.array(k1)
-        s1 = np.array(s1)
-        h1 = np.array(h1)
-        print('Done Move 1')
-        # t1 = time.time()
-        # print(f'Elapsed time: {t1 - t0:.2f} seconds')
-        
-        # t0 = time.time()
-        k2, s2, h2 = get_all(m2)
-        k2 = np.array(k2)
-        s2 = np.array(s2)
-        h2 = np.array(h2)
-        print('Done Move 2')
-        # t1 = time.time()
-        # print(f'Elapsed time: {t1 - t0:.2f} seconds')
-
-        np.save(f'{path}/run{i}_fixed/kendall_move1.npy', k1)
-        np.save(f'{path}/run{i}_fixed/kendall_move2.npy', k2)
-        np.save(f'{path}/run{i}_fixed/spearman_move1.npy', s1)
-        np.save(f'{path}/run{i}_fixed/spearman_move2.npy', s2)
-        np.save(f'{path}/run{i}_fixed/hamming_move1.npy', h1)
-        np.save(f'{path}/run{i}_fixed/hamming_move2.npy', h2)
-        print(f'Done: run{i}')
-
-    print('--------------DONE ONE WHOLE MODEL--------------')
+    for i in range(1, 21):
+        m1, m2 = parser.parse_free(f'{path[0]}')
