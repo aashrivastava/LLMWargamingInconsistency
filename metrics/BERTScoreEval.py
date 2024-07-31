@@ -140,18 +140,19 @@ if __name__ == '__main__':
     # 
     # ref = 'I want to drive a Mercedes Benz. I also think we should go take down their communications'
 
-    turbo1 = "You should authorize the 5th Task Force to defend itself against any threatening actions from China's maritime militia, China Coast Guard, and People's Liberation Army Air Force, ensuring the safety of U.S.A Navy personnel and assets."
+    sent = "The gentle rustling of leaves in the evening breeze brought a sense of peacefulness to the quiet forest."
 
-    turbo2 = "The U.S.A should immediately initiate diplomatic channels to de-escalate tensions with China, while reinforcing its naval presence in the region. Simultaneously, engage in a robust joint exercise with allies in the area to demonstrate preparedness and commitment to the region's security."
 
-    turbo3 = "I recommend that we first initiate diplomatic channels for a dialogue with China and emphasize the need to resolve concerns and misunderstandings through negotiations. Bring this situation before the United Nations and involve key allies such as the UK, EU, Australia, Japan, South Korea, and NATO members to increase international pressure on China. While diplomatic efforts are underway, order the USS Ronald Reagan and the 3rd Task Force to maintain a defensive posture, but provide clear rules of engagement such that they are ready to respond to any aggressive acts with appropriate force. Request permission from Taiwan for temporary deployment of additional personnel and resources for the protection of American military trainers and advisors. Establish a military hotline with China's command center to defuse situations in real-time and prevent misunderstandings that could escalate the conflict."
+    sent2 = "Peace settled over the forest as the evening breeze calmly rustled the leaves."
+    sent3 = "The loud clanging of pots in the bustling kitchen created a sense of chaos in the crowded restaurant."
 
-    four1 = "The President should first engage China diplomatically through the United Nations, seeking to deescalate the situation by presenting evidence of the escalating aggression of the Chinese maritime militia, and advocating for international recognition of the right of passage in open waters. Concurrently, it is recommended to continue the training and support of Taiwanese forces, enhancing their capabilities to act independently where possible. Implement robust defensive measures for Task Force 5, including the deployment of additional anti-air and countermeasures systems to guard against current and potential threats."
 
-    four2 = "I recommend that we first initiate diplomatic channels for a dialogue with China and emphasize the need to resolve concerns and misunderstandings through negotiations. Bring this situation before the United Nations and involve key allies such as the UK, EU, Australia, Japan, South Korea, and NATO members to increase international pressure on China. While diplomatic efforts are underway, order the USS Ronald Reagan and the 3rd Task Force to maintain a defensive posture, but provide clear rules of engagement such that they are ready to respond to any aggressive acts with appropriate force. Request permission from Taiwan for temporary deployment of additional personnel and resources for the protection of American military trainers and advisors. Establish a military hotline with China's command center to defuse situations in real-time and prevent misunderstandings that could escalate the conflict."
+    refs = [sent2, sent3]
+    cands = [sent] * len(refs)
+    print(cands)
     
     start =  time.time()
-    F1_1 = evaluator.get_berts_within([turbo3, four2])
+    _, _, F1_1 = evaluator.scorer.score(cands, refs)
     end = time.time()
 
     print(f'{F1_1}: Completed in {end-start:.2f} seconds')
