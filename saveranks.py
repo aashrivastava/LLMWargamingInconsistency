@@ -16,19 +16,47 @@ reval = RankEval()
 #     else:
 #         return 0
 
-def get_all(responses: list[dict[str, int]], verbose=False):
+def get_all(responses: list[dict[str, int]]):
 
-    k = reval.get_kendalls(responses, verbose=verbose)
-    s = reval.get_spearmans(responses, verbose=verbose)
-    h = reval.get_hamming(responses, verbose=verbose)
+    k = reval.get_kendalls(responses)
+    s = reval.get_spearmans(responses)
+    h = reval.get_hamming(responses)
     
     return k, s, h
 
 
 paths = [
-    '/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4-rank-False-20-1.0',
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/claude35sonnet-rank-False-20-1.0/main', '_fixed'),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/claude35sonnet-rank-True-20-1.0/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt3.5turbo-rank-False-20-1.0/main', '_fixed'),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt3.5turbo-rank-True-20-1.0/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4-rank-False-20-1.0/main', '_fixed'),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4-rank-True-20-1.0/main', '')
 ]
 
 for path in paths:
     for i in range(1, 21):
-        m1, m2 = parser.parse_free(f'{path[0]}')
+        try:
+            m1, m2 = parser.parse_rankings(f'{path[0]}/run{i}{path[1]}/run{i}{path[1]}.csv')
+        except:
+            print(f'{path[0]}/run{i}{path[1]}/run{i}{path[1]}.csv')
+            break
+        
+        try:
+            k1, s1, h1 = get_all(m1)
+            k2, s2, h2 = get_all(m2)
+        except:
+            print(f'{path[0]}/run{i}{path[1]}/run{i}{path[1]}.csv')
+            continue
+
+        k1, k2 = np.array(k1), np.array(k2)
+        s1, s2 = np.array(s1), np.array(s2)
+        h1, h2 = np.array(h1), np.array(h2)
+
+        np.savez(f'{path[0]}/run{i}{path[1]}/run{i}_ranks.npz',
+            kendall_move1=k1,
+            kendall_move2=k2,
+            spearman_move1=s1,
+            spearman_move2=s2,
+            hamming_move1=h1,
+            hamming_move2=h2)

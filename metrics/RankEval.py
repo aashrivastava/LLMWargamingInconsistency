@@ -256,10 +256,7 @@ class RankEval(EvaluatorBasics):
             try:
                 result.append(self._kendalls_tau(r1, r2, verbose=verbose))
             except:
-                print(r1)
-                print('---------')
-                print(r2['I'])
-                raise
+                result.append(np.nan)
         
         return result
     
@@ -280,7 +277,10 @@ class RankEval(EvaluatorBasics):
         pairs = self.create_unique_pairs(responses, verbose=verbose)
 
         for r1, r2 in tqdm(pairs, desc='Getting Spearmans for Responses...', disable=not verbose):
-            result.append(self._spearmans_coef(r1, r2, verbose=verbose))
+            try:
+                result.append(self._spearmans_coef(r1, r2, verbose=verbose))
+            except:
+                result.append(np.nan)
         
         return result
     
@@ -301,7 +301,10 @@ class RankEval(EvaluatorBasics):
         pairs = self.create_unique_pairs(responses, verbose=verbose)
 
         for r1, r2 in tqdm(pairs, desc='Getting Hammings for Responses...', disable=not verbose):
-            result.append(self._hamming_distance(r1, r2, verbose=verbose))
+            try:
+                result.append(self._hamming_distance(r1, r2, verbose=verbose))
+            except:
+                result.append(np.nan)
         
         return result
     
