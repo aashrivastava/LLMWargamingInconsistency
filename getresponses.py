@@ -22,7 +22,7 @@ def run_20_simuls_rank(model, explicit_country, start, end):
     simulator = GameSimulator(model, 'rank', explicit_country, 20, 1.0)
     for i in tqdm(range(start, end), desc='Run simulations...'):
         o_directory = f'logging/outputs/v4/{dir_name}'
-        f_name = f'run{i+1}_fixed'
+        f_name = f'run{i+1}'
 
         if 'claude' in model:
             outputs, chats = simulator.run_basic_anthropic()
@@ -31,7 +31,7 @@ def run_20_simuls_rank(model, explicit_country, start, end):
             outputs, chats = simulator.run_basic_oai()
             simulator.write_outputs(outputs, o_directory, f_name=f_name)
     
-    simulator.write_chat(chats, f'logging/chats/v4/{dir_name}', 'chat_fixed')
+    simulator.write_chat(chats, f'logging/chats/v4/{dir_name}', 'chat')
 
 def run_20_simuls_free(model, explicit_country, start, end):
     if model != 'dummy' and 'claude' in model:
@@ -44,7 +44,7 @@ def run_20_simuls_free(model, explicit_country, start, end):
         model_dir_name = 'dummy'
         dir_name = 'dummy'
     if not explicit_country:
-        fixed = '_fixed'
+        fixed = ''
     else:
         fixed = ''
     simulator = GameSimulator(model, 'free', explicit_country, 20, 1.0)
@@ -61,6 +61,7 @@ def run_20_simuls_free(model, explicit_country, start, end):
     
     simulator.write_chat(chats, f'logging/chats/v4/{dir_name}', 'chat_fixed')
 
-perm = ('claude-3-5-sonnet-20240620', True)
+perms = [('gpt-4o', False), ('gpt-4o', True)]
 
-run_20_simuls_free(perm[0], perm[1], 12, 20)
+for perm in perms:
+    run_20_simuls_free(perm[0], perm[1], 0, 20)

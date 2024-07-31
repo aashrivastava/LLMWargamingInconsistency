@@ -23,15 +23,15 @@ class GameSimulator:
         self.N_responses = N_responses
         self.temperature = temperature
         self.chatcreator = ChatCreation(self.control_level, self.explicit_country)
-        if self.model != 'dummy' and self.model in ['gpt-3.5-turbo', 'gpt-4']:
+        if self.model != 'dummy' and 'gpt' in self.model:
             self.prompter = OpenAIPrompting(model=self.model)
-        elif self.model != 'dummy' and self.model in ['claude-3-5-sonnet-20240620', 'claude-3-haiku-20240307']:
+        elif self.model != 'dummy' and 'claude' in self.model:
             self.prompter = AnthropicPrompting(model=self.model)
         else:
             self.prompter = None
     
     def run_basic_oai(self):
-        assert self.model in ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo']
+        assert 'gpt' in self.model
 
         responses = []
         first_prompt = self.chatcreator.move_1()
@@ -59,7 +59,7 @@ class GameSimulator:
         return responses, curr_chat
     
     def run_basic_anthropic(self):
-        assert self.model in ['claude-3-5-sonnet-20240620', 'claude-3-haiku-20240307']
+        assert 'claude' in self.model
 
         responses = []
         first_prompt = self.chatcreator.move_1()
