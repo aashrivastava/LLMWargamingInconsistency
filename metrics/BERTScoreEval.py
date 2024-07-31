@@ -66,7 +66,6 @@ class BERTScoreEval(EvaluatorBasics):
         # very rare, really only happens when texts are the exact same
         return F1.apply_(lambda x: 0 if 1 - x < 0 else 1 if 1 - x > 1 else 1 - x)
 
-        return F1
     
     def get_single_score(self, r1: str, r2: str) -> float:
         '''
