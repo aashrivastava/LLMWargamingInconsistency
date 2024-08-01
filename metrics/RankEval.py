@@ -4,6 +4,7 @@ import math
 from utils.EvalsBase import EvaluatorBasics
 import random
 import numpy as np
+import scipy.stats as sc
 
 ## WHAT TO DO FOR LATER/TOMORROW
 ## ___PRESSING___
@@ -396,18 +397,24 @@ if __name__ == '__main__':
     rank2 = ['a', 'b', 'd', 'c']
     rank3 = ['d', 'c', 'b','a']
 
-    rank3_dict = {c: i+1 for i, c in enumerate(rank3)}
+    rank1_dict = {c: i+1 for i, c in enumerate(rank1)}
+    ranks1_list = [rank1_dict[key] for key in ['a', 'b', 'c', 'd']]
 
-    ranks1 = [{c: i+1 for i, c in enumerate(r)} for r in [rank1, rank2, rank3]]
+    # ranks1 = [{c: i+1 for i, c in enumerate(r)} for r in [rank1, rank2, rank3]]
     
     r1 = ['c', 'b', 'd', 'a']
     r2 = ['a', 'b', 'c', 'd']
     r3 = ['b', 'a', 'd', 'c']
     ranks2 = [{c: i+1 for i, c in enumerate(r)} for r in [r1, r2, r3]]
 
-    r2_dict = {c: i+1 for i, c in enumerate(r2)}
+    r3_dict = {c: i+1 for i, c in enumerate(r3)}
+    r3_list = [r3_dict[key] for key in ['a', 'b', 'c', 'd']]
 
     evaluator = RankEval()
-    print(evaluator.get_metric_across(ranks1, ranks2, metric='spearman'))
-    print(evaluator._spearmans_coef(rank3_dict, r2_dict))
+    print(r3_dict, rank1_dict)
+    print(evaluator._kendalls_tau(r3_dict, rank1_dict))
+    print('')
+    print(r3_list, ranks1_list)
+    print(1 - (sc.kendalltau(r3_list, ranks1_list)[0] + 1)/2)
+    # print(evaluator._spearmans_coef(rank3_dict, r2_dict))
 

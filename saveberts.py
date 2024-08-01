@@ -10,15 +10,19 @@ beval = BERTScoreEval()
 
 
 paths = [
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt3.5turbo-free-False-20-1.0', '_fixed'),
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt3.5turbo-free-True-20-1.0', ''),
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4-free-False-20-1.0', '_fixed'),
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4-free-True-20-1.0', '')
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4o-free-False-20-1.0/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4o-free-True-20-1.0/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini-free-False-20-1.0/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini-free-True-20-1.0/main', '')
 ]
 
 
 for path in tqdm(paths, desc='Running through models...'):
-    for i in tqdm(range(1, 21), desc=f'Processing...'):
+    if 'gpt4o' in path[0] and 'mini' not in path[0] and 'False' in path[0]:
+        start = 13
+    else:
+        start = 1
+    for i in tqdm(range(start, 21), desc=f'Processing...'):
         m1, m2 = parser.parse_free(f'{path[0]}/run{i}{path[1]}/run{i}{path[1]}.csv')
         
         t0 = time.time()

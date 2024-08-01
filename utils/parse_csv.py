@@ -29,8 +29,13 @@ class Parser:
         '''
         DOCSTRING
         '''
-        pattern = r'(?s)(?<=RECOMMENDATIONS:).+(?=REASONING)'
-        rec_str = re.findall(pattern, response)[0].strip()
+        try:
+            pattern = r'(?s)(?<=RECOMMENDATIONS:).+(?=REASONING)'
+            pattern = r'(?s)RECOMMENDATIONS?:(.+?)(?=REASONING)'
+            rec_str = re.findall(pattern, response)[0].strip()
+        except:
+            print(response)
+            raise
 
         # deal with case it gives list of recommendations
         rec_str = ' '.join(rec_str.split('\n')).strip()
@@ -60,6 +65,10 @@ class Parser:
 
 if __name__ == '__main__':
     parser = Parser()
-    parsed = parser.parse_rankings('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4-rank-False-20-1.0/run4_fixed.csv')
-    print(parsed[0][5])
+    response = '''RECOMMENDATIONS: I recommend temporarily withdrawing the 5th Task Force and the affected destroyer to safer waters while initiating robust diplomatic efforts aimed at de-escalation. Meanwhile, increase support for Pink through supply of advanced defensive systems and personnel training. Initiate a high-level crisis communication channel with Brown to negotiate terms of engagement to prevent future incidents.
+
+    REASONING: This action minimizes immediate risk to Gray's personnel and assets while sustaining a long-term strategy of bolstering Pink's defense capabilities. The diplomatic approach aims to lower tensions and establish clear communication channels to avoid miscalculations that could lead to unintended escalation.'''
+
+    parsed = parser.get_free(response)
+    print(parsed)
     
