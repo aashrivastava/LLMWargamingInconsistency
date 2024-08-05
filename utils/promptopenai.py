@@ -111,4 +111,11 @@ class OpenAIPrompting:
 
 
         return responses
+
+
+if __name__ == '__main__':
+    x = OpenAIPrompting('gpt-4o-mini')
+    y = x.parse_outputs(x.get_completions([{'role': 'user', 'content': 'hello what is the meaning of life. respond in < 10 words?'}], N_responses=2, temperature=1.5))
+    for _ in y:
+        print(_)
     
