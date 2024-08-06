@@ -133,25 +133,34 @@ class BERTScoreEval(EvaluatorBasics):
     
 # for my purposes 
 if __name__ == '__main__':
-    evaluator = BERTScoreEval(rescale_with_baseline=True,
-        model = 'microsoft/deberta-xlarge-mnli', lang='en')
+    # evaluator = BERTScoreEval(rescale_with_baseline=True,
+    #     model = 'microsoft/deberta-xlarge-mnli', lang='en')
     # to test
     # 
     # ref = 'I want to drive a Mercedes Benz. I also think we should go take down their communications'
 
-    sent = "The gentle rustling of leaves in the evening breeze brought a sense of peacefulness to the quiet forest."
+    sents = [
+        '''
+Veins appear blue due to the way light interacts with your skin and the blood within your veins. When light hits your skin, it penetrates to different depths and interacts with tissues and blood vessels. Higher energy blue light is scattered more than other colors by the skin and is more likely to return to the surface, making the veins look blue despite the blood being red.''',
+        '''Veins appear blue primarily due to the way light penetrates the skin and is absorbed and scattered back to the viewer's eyes.''',
+        '''Veins appear blue primarily due to the way light interacts with the skin and the blood. Light from the environment penetrates the skin and is absorbed differently by various wavelengths. Veins contain oxygen-depleted blood, which is darker and absorbs more light. When the blue light wavelengths are scattered back to the observer more than other colors, the veins look blue from the surface of the skin.''',
+        '''Veins appear blue primarily due to the way light interacts with the skin and the blood. When light hits the skin, it penetrates to different depths and wavelengths of light are absorbed and scattered differently. Blue light, being of shorter wavelength, is scattered more than other colors and is reflected back to our eyes more strongly from deeper tissues where veins are located.''',
+        '''Veins appear blue due to the way light interacts with the skin and blood. Light penetrating the skin scatters in all directions, but blue light scatters more than other colors, making it more visible when it comes back out of the skin.''',
+        '''Veins appear blue primarily because of the way light interacts with the skin and blood. Deoxygenated blood in veins absorbs more wavelengths of light, reflecting mostly blue light back to our eyes through the skin.''',
+        '''Veins appear blue because of the way light interacts with your skin and the blood inside your veins. Although the blood is always red, due to the oxygen-rich hemoglobin, the skin and tissues absorb more of the red light wavelengths and scatter the blue light back to your eyes, making the veins look blue from the surface.''',
+        '''Veins appear blue not because the blood inside them is blue, but due to the way light penetrates the skin and is absorbed or scattered by the tissues and blood.''',
+        '''Veins appear blue primarily due to the way light interacts with the skin and blood. Light that hits the skin can either be absorbed or scattered. Veins absorb more of the red wavelengths of light, reflecting back the blue wavelengths more prominently due to the scattering properties of skin. This effect makes the veins appear blue, especially through lighter skin.''',
+        '''Veins appear blue due to the way light penetrates the skin and is absorbed and reflected back to the eye.''',
+        '''Veins appear blue due to the way light interacts with our skin and the blood within our veins. Light that penetrates the skin gets absorbed and scattered, and the higher energy (shorter wavelength) blue light is scattered more than the other colors. When this scattered blue light reaches our eyes, it makes the veins look blue, even though the blood itself is red.'''
+    ]
 
-
-    sent2 = "Peace settled over the forest as the evening breeze calmly rustled the leaves."
-    sent3 = "The loud clanging of pots in the bustling kitchen created a sense of chaos in the crowded restaurant."
-
-
-    refs = [sent, sent2, sent3]
+    for sent in sents:
+        print(len(sent.split(' ')))
     
-    start =  time.time()
-    F1_1 = evaluator.get_berts_within(refs)
-    end = time.time()
+    # F1_1 = evaluator.get_berts_within(sents)
+    # print(F1_1)
+    # print(torch.mean(F1_1))
 
-    print(f'{F1_1}: Completed in {end-start:.2f} seconds')
+    # print(f'{F1_1}: Completed in {end-start:.2f} seconds')
 
     

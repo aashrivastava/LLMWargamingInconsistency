@@ -44,12 +44,4 @@ if __name__ == '__main__':
     create = EvaluatorBasics()
     pairs = create.create_unique_pairs(['a', 'b', 'c', 'd', 'e', 'f'])
 
-    refs = []
-    cands = []
-    for r1, r2 in pairs:
-        refs.append(r1)
-        cands.append(r2)
-    
-    print(refs)
-    print(cands)
-
+    print(pairs)

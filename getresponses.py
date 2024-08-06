@@ -13,7 +13,7 @@ def run_20_simuls_rank(model, explicit_country, start, end):
     if model != 'dummy' and 'claude' in model:
         model_dir_name = re.sub(r'-', '', model)[:-8]
         dir_name = f'{model_dir_name}-rank-{explicit_country}-20-1.0'
-    elif model != 'dummy' and 'gpt' in model:
+    elif model != 'dummy' and ('gpt' in model or 'lama' in model):
         model_dir_name = re.sub(r'-', '', model)
         dir_name = f'{model_dir_name}-rank-{explicit_country}-20-1.0'
     else:
@@ -27,7 +27,7 @@ def run_20_simuls_rank(model, explicit_country, start, end):
         if 'claude' in model:
             outputs, chats = simulator.run_basic_anthropic()
             simulator.write_outputs(outputs, o_directory, f_name=f_name)
-        elif 'gpt' in model:
+        elif 'gpt' in model or 'lama' in model:
             outputs, chats = simulator.run_basic_oai()
             simulator.write_outputs(outputs, o_directory, f_name=f_name)
     
@@ -37,7 +37,7 @@ def run_20_simuls_free(model, explicit_country, start, end):
     if model != 'dummy' and 'claude' in model:
         model_dir_name = re.sub(r'-', '', model)[:-8]
         dir_name = f'{model_dir_name}-free-{explicit_country}-20-1.0'
-    elif model != 'dummy' and 'gpt' in model:
+    elif model != 'dummy' and ('gpt' in model or 'lama' in model):
         model_dir_name = re.sub(r'-', '', model)
         dir_name = f'{model_dir_name}-free-{explicit_country}-20-1.0'
     else:
@@ -55,7 +55,7 @@ def run_20_simuls_free(model, explicit_country, start, end):
         if 'claude' in model:
             outputs, chats = simulator.run_basic_anthropic()
             simulator.write_outputs(outputs, o_directory, f_name=f_name)
-        elif 'gpt' in model:
+        elif 'gpt' in model or 'lama' in model:
             outputs, chats = simulator.run_basic_oai()
             simulator.write_outputs(outputs, o_directory, f_name=f_name)
     

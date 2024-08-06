@@ -42,11 +42,18 @@ class OpenAIPrompting:
     def __init__(self, model: str):
         self.model = model
         # self.n_responses = n_responses
-        self.client = oai.OpenAI(
-            organization=os.environ.get('OPENAI_ORG_KEY'),
-            project=os.environ.get('OPENAI_PROJECT_ID')
-        )
-    
+        if 'lama' in model:
+            print('here')
+            self.client = oai.OpenAI(
+                api_key = os.environ.get('TOGETHER_API_KEY'),
+                base_url = 'https://api.together.xyz/v1'
+            )
+        else:
+            self.client = oai.OpenAI(
+                organization=os.environ.get('OPENAI_ORG_KEY'),
+                project=os.environ.get('OPENAI_PROJECT_ID')
+            )
+        
         
     def get_completions(self, curr_chat: list[dict[str, str]], N_responses: int=20, temperature: float=1.0, json_mode: bool=False):
         '''
@@ -114,8 +121,8 @@ class OpenAIPrompting:
 
 
 if __name__ == '__main__':
-    x = OpenAIPrompting('gpt-4o-mini')
-    y = x.parse_outputs(x.get_completions([{'role': 'user', 'content': 'hello what is the meaning of life. respond in < 10 words?'}], N_responses=2, temperature=1.5))
+    x = OpenAIPrompting('meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo')
+    y = x.parse_outputs(x.get_completions([{'role': 'user', 'content': 'What happens to you if you eat watermelon seeds? Respond in 1 sentence'}], N_responses=20, temperature=1))
     for _ in y:
         print(_)
     
