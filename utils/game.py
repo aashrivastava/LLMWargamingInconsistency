@@ -1,5 +1,6 @@
 from utils.promptopenai import OpenAIPrompting
 from utils.promptanthropic import AnthropicPrompting
+from utils.promptllama import LlamaPrompting
 from utils.createchats import ChatCreation
 from metrics.BERTScoreEval import BERTScoreEval
 from metrics.BiDirectionalEntailmentEval import BiDirectionalEntailmentEval
@@ -23,10 +24,12 @@ class GameSimulator:
         self.N_responses = N_responses
         self.temperature = temperature
         self.chatcreator = ChatCreation(self.control_level, self.explicit_country)
-        if self.model != 'dummy' and 'gpt' in self.model:
+        if self.model != 'dummy' and ('gpt' in self.model):
             self.prompter = OpenAIPrompting(model=self.model)
         elif self.model != 'dummy' and 'claude' in self.model:
             self.prompter = AnthropicPrompting(model=self.model)
+        elif self.model != 'dummy' and 'lama' in self.model:
+            self.prompter = LlamaPrompting(model=self.model)
         else:
             self.prompter = None
     
@@ -57,6 +60,37 @@ class GameSimulator:
             responses.append(o_2)
         
         return responses, curr_chat
+    
+    def run_basic_llama(self):
+        assert 'lama' in self.model
+
+        responses = []
+        first_prompt = self.chatcreator.move_1()
+        curr_chat = first_prompt
+
+        if self.prompter:
+            print('Getting move 1 completions...')
+            move1_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature)
+            outputs_1 = self.prompter.parse_outputs(move1_completions)
+            print('Got move 1 completions!')
+            responses.append(outputs_1)
+            self.chatcreator.move_2(curr_chat)
+            print('Getting move 2 completions...')
+            move2_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature)
+            outputs_2 = self.prompter.parse_outputs(move2_completions)
+            print('Got move 2 completions!')
+            responses.append(outputs_2)
+        # dummy is running
+        else:
+            o_1 = ['text move 1' for i in range(self.N_responses)]
+            responses.append(o_1)
+            o_2 = ['text move 2' for i in range(self.N_responses)]
+            responses.append(o_2)
+        
+        return responses, curr_chat
+        
+        return responses, curr_chat
+
     
     def run_basic_anthropic(self):
         assert 'claude' in self.model

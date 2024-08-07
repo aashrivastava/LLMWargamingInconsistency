@@ -40,6 +40,11 @@ class BERTScoreEval(EvaluatorBasics):
         super().__init__()
         print(f'BERTScore Evaluator Initialized')
     
+    def regular_score(self, cands, refs):
+        P, R, F1 = self.scorer.score(cands, refs)
+
+        return 1 - F1
+    
     def get_berts_within(self, responses: list[str]) -> torch.Tensor:
         '''
         Given a list of responses, compute the individual BERTScores between each pair.

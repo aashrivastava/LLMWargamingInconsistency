@@ -58,7 +58,8 @@ class RankEval(EvaluatorBasics):
 
     def _kendalls_tau(self, rank1: dict[str, int], rank2: dict[str, int], verbose: bool=False) -> float:
         '''
-        Calculates rescaled 1 -kendall's tau between two rankings. Rescaled from [-1, 1] to [0, 1]
+        Calculates rescaled 1 -kendall's tau between two rankings. Rescaled from [-1, 1] to [0, 1]. 
+        This is kendall inconsistency for one pair
 
         Inputs:
             rank1: dict[str, int]
@@ -393,28 +394,55 @@ class RankEval(EvaluatorBasics):
         else: raise NameError('This is not a valid metric')
         
 if __name__ == '__main__':
-    rank1 = ['a', 'b', 'c', 'd']
+    rank1 = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
+    # print(len(rank1))
     rank2 = ['a', 'b', 'd', 'c']
     rank3 = ['d', 'c', 'b','a']
 
     rank1_dict = {c: i+1 for i, c in enumerate(rank1)}
-    ranks1_list = [rank1_dict[key] for key in ['a', 'b', 'c', 'd']]
-
-    # ranks1 = [{c: i+1 for i, c in enumerate(r)} for r in [rank1, rank2, rank3]]
-    
-    r1 = ['c', 'b', 'd', 'a']
-    r2 = ['a', 'b', 'c', 'd']
-    r3 = ['b', 'a', 'd', 'c']
-    ranks2 = [{c: i+1 for i, c in enumerate(r)} for r in [r1, r2, r3]]
-
-    r3_dict = {c: i+1 for i, c in enumerate(r3)}
-    r3_list = [r3_dict[key] for key in ['a', 'b', 'c', 'd']]
-
     evaluator = RankEval()
-    print(r3_dict, rank1_dict)
-    print(evaluator._kendalls_tau(r3_dict, rank1_dict))
-    print('')
-    print(r3_list, ranks1_list)
-    print(1 - (sc.kendalltau(r3_list, ranks1_list)[0] + 1)/2)
+    
+    def swap_randomly(rank, n):
+        modified_ranking = rank.copy()
+
+        not_swapped = set(rank.keys())
+        for i in range(n):
+            to_replace = np.random.choice(list(not_swapped), 2, replace=False)
+            swapped = set(to_replace)
+
+            modified_ranking[to_replace[0]] = rank[to_replace[1]]
+            modified_ranking[to_replace[1]] = rank[to_replace[0]]
+            not_swapped -= swapped
+        
+        print(swapped)
+        return modified_ranking
+    
+    def swap_one(rank):
+        modified_ranking = rank.copy()
+
+        to_replace = np.random.randint(0, len(list(rank.keys())) - 1)
+
+        replace_cat = rank1[to_replace]
+        replace_cat2 = rank1[to_replace + 1]
+
+        modified_ranking[replace_cat] = rank[replace_cat2]
+        modified_ranking[replace_cat2] = rank[replace_cat]
+
+        return modified_ranking
+
+
+    taus = np.zeros(1000)
+    for i in range(1000):
+        taus[i] = evaluator._kendalls_tau(rank1_dict, swap_one(rank1_dict))
+    
+    print(taus.mean())
+    print(np.std(taus))
+    print(np.sum(taus < .23) / len(taus) * 100)
+
+
+    # print(evaluator._kendalls_tau(r3_dict, rank1_dict))
+    # print('')
+    # print(r3_list, ranks1_list)
+    # print(1 - (sc.kendalltau(r3_list, ranks1_list)[0] + 1)/2)
     # print(evaluator._spearmans_coef(rank3_dict, r2_dict))
 

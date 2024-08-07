@@ -43,7 +43,6 @@ class OpenAIPrompting:
         self.model = model
         # self.n_responses = n_responses
         if 'lama' in model:
-            print('here')
             self.client = oai.OpenAI(
                 api_key = os.environ.get('TOGETHER_API_KEY'),
                 base_url = 'https://api.together.xyz/v1'
@@ -84,7 +83,7 @@ class OpenAIPrompting:
                 temperature = 0.0,
                 response_format = {'type': 'json_object'}
             )
-        else:
+        elif 'gpt' in self.model:
             completions = self.client.chat.completions.create(
                 model = self.model,
                 messages = curr_chat,
