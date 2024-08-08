@@ -120,8 +120,8 @@ class OpenAIPrompting:
 
 
 if __name__ == '__main__':
-    x = OpenAIPrompting('meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo')
-    y = x.parse_outputs(x.get_completions([{'role': 'user', 'content': 'What happens to you if you eat watermelon seeds? Respond in 1 sentence'}], N_responses=20, temperature=1))
+    x = OpenAIPrompting('gpt-4o-mini')
+    y = x.get_completions([{'role': 'user', 'content': 'Hello my name is aryan!'}], N_responses=1)
     for _ in y:
         print(_)
     
