@@ -40,8 +40,8 @@ class BERTScoreEval(EvaluatorBasics):
         super().__init__()
         print(f'BERTScore Evaluator Initialized')
     
-    def regular_score(self, cands, refs):
-        P, R, F1 = self.scorer.score(cands, refs)
+    def regular_score(self, cands, refs, verbose=False):
+        P, R, F1 = self.scorer.score(cands, refs, verbose=verbose)
 
         return 1 - F1
     
