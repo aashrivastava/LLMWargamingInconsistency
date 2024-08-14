@@ -429,15 +429,48 @@ if __name__ == '__main__':
         modified_ranking[replace_cat2] = rank[replace_cat]
 
         return modified_ranking
-
-
-    taus = np.zeros(1000)
-    for i in range(1000):
-        taus[i] = evaluator._kendalls_tau(rank1_dict, swap_one(rank1_dict))
     
-    print(taus.mean())
-    print(np.std(taus))
-    print(np.sum(taus < .23) / len(taus) * 100)
+    def swap_first(rank, n):
+        '''
+        swaps first ranked with nth rank
+        '''
+        modified_ranking = rank.copy()
+
+        replace_cat = rank1[0]
+        replace_cat2 = rank1[n-1]
+
+        modified_ranking[replace_cat] = rank[replace_cat2]
+        modified_ranking[replace_cat2] = rank[replace_cat]
+
+        return modified_ranking
+    
+    def swap(rank, ref, n_down):
+        '''
+        swaps `ref` ranking with n_down ranking
+        '''
+        modified_ranking = rank.copy()
+
+        replace_cat = rank1[ref - 1]
+        replace_cat2 = rank1[ref + n_down - 1]
+
+        modified_ranking[replace_cat] = rank[replace_cat2]
+        modified_ranking[replace_cat2] = rank[replace_cat]
+
+        return modified_ranking
+
+
+    taus = [[] for i in range(19)]
+    for i in range(19):
+        for j in range(i + 1, 19 - (i + 1)):
+            taus[i].append(evaluator._kendalls_tau(rank1_dict, swap(rank1_dict, i+1, j)))
+
+    print(taus)
+    # print(taus.mean())
+    # print(np.std(taus))
+    
+    # print(taus.mean())
+    # print(np.std(taus))
+    # print(np.sum(taus < .23) / len(taus) * 100)
 
 
     # print(evaluator._kendalls_tau(r3_dict, rank1_dict))
