@@ -30,6 +30,7 @@ class LlamaPrompting:
         return completions
 
 if __name__ == '__main__':
+    # llama is ***bad*** at ranking
     x = LlamaPrompting('meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo')
     messages = [
         {'role': 'system',
