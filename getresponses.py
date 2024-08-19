@@ -2,6 +2,7 @@
 from tqdm.auto import tqdm
 import re
 import csv
+import os
 from utils.game import GameSimulator
 
 perms = [
@@ -9,7 +10,7 @@ perms = [
     ('gpt-4', False),
 ]
 
-def run_main(model, explicit_country, response_env, temperature=1.0, N_responses=20):
+def run_main(model, explicit_country, response_env, temperature=1.0, N_responses=20, start=1, end=20):
     if model != 'dummy' and 'claude' in model:
         model_dir_name = re.sub(r'-', '', model)[:-8]
         dir_name = f'{model_dir_name}-{response_env}-{explicit_country}-{N_responses}-{temperature}'
@@ -26,11 +27,18 @@ def run_main(model, explicit_country, response_env, temperature=1.0, N_responses
         model_dir_name = 'dummy'
         dir_name = 'dummy'
     
+    # make output directory
+    os.makedirs(f'logging/outputs/v4/{dir_name}/main', exist_ok=True)
+    # make chat directory
+    os.makedirs(f'logging/chats/v4/{dir_name}', exist_ok=True)
+
+    o_directory = os.path.abspath(f'logging/outputs/v4/{dir_name}/main')
+    chat_directory = os.path.abspath(f'logging/chats/v4/{dir_name}')
+    
     simulator = GameSimulator(model, f'{response_env}', explicit_country, temperature, N_responses)
 
-    for i in tqdm(range(N_responses), desc='Getting Completions...'):
-        o_directory = f'logging/outputs/v4/{dir_name}'
-        o_file = f'run{i+1}'
+    for i in tqdm(range(start, end+1), desc='Getting Completions...'):
+        o_file = f'run{i}'
 
         if 'claude' in model:
             outputs, chats = simulator.run_basic_anthropic()
@@ -40,10 +48,18 @@ def run_main(model, explicit_country, response_env, temperature=1.0, N_responses
             outputs, chats = simulator.run_basic_llama()
         simulator.write_outputs(outputs, o_directory, f_name=o_file)
     
-    simulator.write_chat(chats, f'logging/chats/v4/{dir_name}', 'chat')
+    simulator.write_chat(chats, chat_directory, 'chat')
         
         
+perms = [
+    ['gpt-4o-mini', False, 'free', 0.8, 20],
+    ['gpt-4o-mini', True, 'rank', 0.8, 20],
+    ['gpt-4o-mini', False, 'rank', 0.8, 20]
 
+]
+if __name__ == '__main__':
+    for perm in perms:
+        run_main(perm[0], perm[1], perm[2], temperature=perm[3], N_responses=perm[4])
 
 
 # def run_20_simuls_rank(model, explicit_country, start, end):

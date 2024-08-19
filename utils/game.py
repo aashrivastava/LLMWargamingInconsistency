@@ -16,7 +16,7 @@ class GameSimulator:
     '''
     IMPLEMENT DOCSTRING
     '''
-    def __init__(self, model, control_level, explicit_country, N_responses, temperature):
+    def __init__(self, model, control_level, explicit_country, temperature, N_responses):
         assert control_level.lower() in ['free', 'rank', 'nudge']
         self.model = model
         self.control_level = control_level

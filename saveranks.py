@@ -26,16 +26,14 @@ def get_all(responses: list[dict[str, int]]):
 
 
 paths = [
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4o-rank-False-20-1.0/main', ''),
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4o-rank-True-20-1.0/main', ''),
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini-rank-False-20-1.0/main', ''),
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini-rank-True-20-1.0/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini-rank-False-20-0.8/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini-rank-True-20-0.8/main', ''),
 ]
 
 for path in paths:
     for i in range(1, 21):
         try:
-            m1, m2 = parser.parse_rankings(f'{path[0]}/run{i}{path[1]}/run{i}{path[1]}.csv')
+            m1, m2 = parser.parse_rankings(f'{path[0]}/run{i}{path[1]}.csv')
         except:
             print(f'{path[0]}/run{i}{path[1]}/run{i}{path[1]}.csv')
             break
