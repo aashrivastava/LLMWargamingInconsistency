@@ -16,14 +16,15 @@ class GameSimulator:
     '''
     IMPLEMENT DOCSTRING
     '''
-    def __init__(self, model, control_level, explicit_country, temperature, N_responses):
+    def __init__(self, model, control_level, explicit_country, adversary_response, temperature, N_responses):
         assert control_level.lower() in ['free', 'rank', 'nudge']
         self.model = model
         self.control_level = control_level
         self.explicit_country = explicit_country
+        self.adversary_response = adversary_response
         self.N_responses = N_responses
         self.temperature = temperature
-        self.chatcreator = ChatCreation(self.control_level, self.explicit_country)
+        self.chatcreator = ChatCreation(self.control_level, self.explicit_country, self.adversary_response)
         if self.model != 'dummy' and ('gpt' in self.model):
             self.prompter = OpenAIPrompting(model=self.model)
         elif self.model != 'dummy' and 'claude' in self.model:

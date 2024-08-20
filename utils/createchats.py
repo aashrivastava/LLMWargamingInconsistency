@@ -6,11 +6,12 @@ class ChatCreation:
     '''
     IMPLEMENT DOCSTRING
     '''
-    def __init__(self, control_level, explicit_country):
+    def __init__(self, control_level, explicit_country, adversary_response):
         assert control_level in ['free', 'rank', 'nudge']
 
         self.control_level = control_level
         self.explicit_country = explicit_country
+        self.adversary_response = adversary_response
     
     def get_text_path(self, file_to_use: str) -> str:
         curr_path = os.getcwd()
@@ -132,7 +133,11 @@ class ChatCreation:
     
     def create_incident2_and_question(self):
         incident = 'incident_move2.txt'
-        response = 'adversary_response.txt'
+
+        if self.adversary_response == 'revisionist':
+            response = 'revisionist_response.txt'
+        elif self.adversary_response == 'status quo':
+            response = 'statusquo_response.txt'
 
         if self.control_level == 'free':
             question = 'question_free_v4.txt'
