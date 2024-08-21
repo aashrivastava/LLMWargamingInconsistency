@@ -10,14 +10,14 @@ beval = BERTScoreEval()
 
 
 paths = [
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini-free-False-20-0.8/main', ''),
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini-free-True-20-0.8/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt3.5turbo/free/status_quo/gpt3.5turbo-free-False-20-1.0/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt3.5turbo/free/status_quo/gpt3.5turbo-free-True-20-1.0/main', ''),
 ]
 
 
 for path in tqdm(paths, desc='Running through models...'):
     for i in tqdm(range(1, 21)):
-        m1, m2 = parser.parse_free(f'{path[0]}/run{i}{path[1]}.csv')
+        m1, m2 = parser.parse_free(f'{path[0]}/run{i}/run{i}{path[1]}.csv')
         
         t0 = time.time()
         berts1, berts2 = beval.get_berts_within(m1), beval.get_berts_within(m2)
@@ -26,7 +26,7 @@ for path in tqdm(paths, desc='Running through models...'):
 
         berts1, berts2 = berts1.numpy(), berts2.numpy()
 
-        np.savez(f'{path[0]}/run{i}{path[1]}/run{i}_berts.npz',
+        np.savez(f'{path[0]}/run{i}/run{i}_berts.npz',
             move1=berts1,
             move2=berts2)
 

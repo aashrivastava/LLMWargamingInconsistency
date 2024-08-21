@@ -56,7 +56,8 @@ def run_main(model, explicit_country, response_env, adversary_response, temperat
         
         
 perms = [
-    ['gpt-4o-mini', False, 'rank', 'status quo', 1.0, 20, 1, 20]
+    ['claude-3-5-sonnet-20240620', False, 'rank', 'status quo', 1.0, 20, 1, 1]
+    ['claude-3-5-sonnet-20240620', True, 'rank', 'status quo', 1.0, 20, 1, 20]
 ]
 if __name__ == '__main__':
     for perm in perms:
