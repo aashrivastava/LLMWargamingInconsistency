@@ -10,8 +10,7 @@ beval = BERTScoreEval()
 
 
 paths = [
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4/free/status_quo/gpt4-free-True-20-1.0/main', ''),
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4/free/status_quo/gpt4-free-False-20-1.0/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini/free/revisionist/gpt4omini-free-True-20-0.2/main', ''),
 ]
 
 

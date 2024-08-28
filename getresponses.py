@@ -5,11 +5,6 @@ import csv
 import os
 from utils.game import GameSimulator
 
-perms = [
-    ('gpt-3.5-turbo', False),
-    ('gpt-4', False),
-]
-
 def run_main(model, explicit_country, response_env, adversary_response, temperature=1.0, N_responses=20, start=1, end=20):
     if model != 'dummy' and 'claude' in model:
         model_dir_name = re.sub(r'-', '', model)[:-8]
@@ -56,9 +51,7 @@ def run_main(model, explicit_country, response_env, adversary_response, temperat
         
         
 perms = [
-    ['claude-3-5-sonnet-20240620', True, 'free', 'status quo', 1.0, 20, 6, 20],
-    ['claude-3-5-sonnet-20240620', False, 'rank', 'status quo', 1.0, 20, 1, 20],
-    ['claude-3-5-sonnet-20240620', True, 'rank', 'status quo', 1.0, 20, 1, 20]
+    ['claude-3-5-sonnet-20240620', True, 'free', 'status quo', 1.0, 20, 16, 20],
 ]
 if __name__ == '__main__':
     for perm in perms:
