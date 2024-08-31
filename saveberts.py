@@ -10,12 +10,12 @@ beval = BERTScoreEval()
 
 
 paths = [
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini/free/revisionist/gpt4omini-free-True-20-0.2/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/claude35sonnet/free/status_quo/claude35sonnet-free-True-20-1.0/main', ''),
 ]
 
 
 for path in tqdm(paths, desc='Running through models...'):
-    for i in tqdm(range(1, 21)):
+    for i in tqdm(range(16, 17)):
         m1, m2 = parser.parse_free(f'{path[0]}/run{i}/run{i}{path[1]}.csv')
         
         t0 = time.time()
