@@ -62,8 +62,9 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     import seaborn as sns
 
-    m1, m2 = parser.parse_rankings(f'/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4/rank/status_quo/gpt4-rank-True-20-1.0/main/run1/run1.csv')
+    m1, m2 = parser.parse_rankings(f'/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini/rank/revisionist/gpt4omini-rank-True-20-1.0/main/run3/run3.csv')
     compare = {k: i+1 for k, i in zip(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'], range(19))}
+    print(compare)
     
     m1_list = [reval._kendalls_tau(m1_rank, compare) for m1_rank in m1]
     m2_list = [reval._kendalls_tau(m2_rank, compare) for m2_rank in m2]

@@ -37,7 +37,7 @@ def run_main(model, explicit_country, response_env, adversary_response, temperat
 
     o_directory = os.path.abspath(output_dir)
     
-    simulator = GameSimulator(model, response_env, explicit_country, adversary_response, temperature, N_responses)
+    simulator = GameSimulator(model, response_env, explicit_country, adversary_response, temperature, N_responses, ablated_ranks=ablated_ranks)
 
     for i in tqdm(range(start, end+1), desc='Getting Completions...'):
         o_file = f'run{i}'
@@ -54,7 +54,7 @@ def run_main(model, explicit_country, response_env, adversary_response, temperat
         
         
 perms = [
-    ['gpt-4o-mini', True, 'rank', 'revisionist', 1.0, 20, 1, 2],
+    ['gpt-4o-mini', False, 'rank', 'revisionist', 1.0, 20, 2, 20],
 ]
 if __name__ == '__main__':
     for perm in perms:
