@@ -5,7 +5,7 @@ import csv
 import os
 from utils.game import GameSimulator
 
-def run_main(model, explicit_country, response_env, adversary_response, temperature=1.0, N_responses=20, start=1, end=20):
+def run_main(model, explicit_country, response_env, adversary_response, temperature=1.0, N_responses=20, start=1, end=20, ablated_ranks=False):
     if model != 'dummy' and 'claude' in model:
         model_dir_name = re.sub(r'-', '', model)[:-8]
         dir_name = f'{model_dir_name}-{response_env}-{explicit_country}-{N_responses}-{temperature}'
@@ -28,7 +28,10 @@ def run_main(model, explicit_country, response_env, adversary_response, temperat
     elif adversary_response == 'status quo':
         adversary_response_dir_name = 'status_quo'
     
-    output_dir = f'logging/outputs/v4/{model_dir_name}/{response_env}/{adversary_response_dir_name}/{dir_name}/main'
+    if not ablated_ranks:
+        ablated_ranks = ''
+    
+    output_dir = f'logging/outputs/v4/{model_dir_name}/{response_env}/{adversary_response_dir_name}/{ablated_ranks}/{dir_name}/main'
     for i in range(start, end+1):
         os.makedirs(f'{output_dir}/run{i}', exist_ok=True)
 
@@ -51,11 +54,11 @@ def run_main(model, explicit_country, response_env, adversary_response, temperat
         
         
 perms = [
-    ['claude-3-5-sonnet-20240620', True, 'free', 'status quo', 1.0, 20, 19, 20],
+    ['gpt-4o-mini', True, 'rank', 'revisionist', 1.0, 20, 1, 2],
 ]
 if __name__ == '__main__':
     for perm in perms:
-        run_main(perm[0], perm[1], perm[2], perm[3], temperature=perm[4], N_responses=perm[5], start=perm[6], end=perm[7])
+        run_main(perm[0], perm[1], perm[2], perm[3], temperature=perm[4], N_responses=perm[5], start=perm[6], end=perm[7], ablated_ranks='reversed')
 
 
 # def run_20_simuls_rank(model, explicit_country, start, end):

@@ -6,12 +6,13 @@ class ChatCreation:
     '''
     IMPLEMENT DOCSTRING
     '''
-    def __init__(self, control_level, explicit_country, adversary_response):
+    def __init__(self, control_level, explicit_country, adversary_response, ablated_ranks=False):
         assert control_level in ['free', 'rank', 'nudge']
 
         self.control_level = control_level
         self.explicit_country = explicit_country
         self.adversary_response = adversary_response
+        self.ablated_ranks = ablated_ranks
     
     def get_text_path(self, file_to_use: str) -> str:
         curr_path = os.getcwd()
@@ -100,7 +101,10 @@ class ChatCreation:
         elif self.control_level == 'nudge':
             question = 'question_nudge.txt'
         else:
-            question = 'question_options_v4.txt'
+            if not self.ablated_ranks:
+                question = 'question_options_v4.txt'
+            elif self.ablated_ranks == 'reversed':
+                question = 'question_options_v4_reversed.txt'
 
         if self.explicit_country:
             replacement_file = 'replacement_explicit.json'
@@ -144,7 +148,10 @@ class ChatCreation:
         elif self.control_level == 'nudge':
             question = 'question_nudge.txt'
         else:
-            question = 'question_options_v4.txt'
+            if not self.ablated_ranks:
+                question = 'question_options_v4.txt'
+            elif self.ablated_ranks == 'reversed':
+                question = 'question_options_v4_reversed.txt'
 
         if self.explicit_country:
             replacement_file = 'replacement_explicit.json'
@@ -171,7 +178,7 @@ class ChatCreation:
 
 
 if __name__ == '__main__':
-    x = ChatCreation('free', False)
+    x = ChatCreation('rank', True, 'status quo', ablated_ranks='reversed')
     y = x.move_1()
     # print(y[0]['content'], y[1]['content'])
     # print('---------------------')
