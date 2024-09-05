@@ -54,11 +54,11 @@ def run_main(model, explicit_country, response_env, adversary_response, temperat
         
         
 perms = [
-    ['gpt-4o-mini', False, 'rank', 'revisionist', 1.0, 20, 2, 20],
+    ['claude-3-5-sonnet-20240620', True, 'free', 'status quo', 1.0, 20, 19, 20],
 ]
 if __name__ == '__main__':
     for perm in perms:
-        run_main(perm[0], perm[1], perm[2], perm[3], temperature=perm[4], N_responses=perm[5], start=perm[6], end=perm[7], ablated_ranks='reversed')
+        run_main(perm[0], perm[1], perm[2], perm[3], temperature=perm[4], N_responses=perm[5], start=perm[6], end=perm[7])
 
 
 # def run_20_simuls_rank(model, explicit_country, start, end):

@@ -15,7 +15,7 @@ paths = [
 
 
 for path in tqdm(paths, desc='Running through models...'):
-    for i in tqdm(range(16, 17)):
+    for i in tqdm(range(19, 21)):
         m1, m2 = parser.parse_free(f'{path[0]}/run{i}/run{i}{path[1]}.csv')
         
         t0 = time.time()
