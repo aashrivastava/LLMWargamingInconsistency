@@ -6,13 +6,14 @@ class ChatCreation:
     '''
     IMPLEMENT DOCSTRING
     '''
-    def __init__(self, control_level, explicit_country, adversary_response, ablated_ranks=False):
+    def __init__(self, control_level='free', explicit_country=True, adversary_response='revisionist', identifiable_country='Taiwan', ablated_ranks=False):
         assert control_level in ['free', 'rank', 'nudge']
 
         self.control_level = control_level
         self.explicit_country = explicit_country
         self.adversary_response = adversary_response
         self.ablated_ranks = ablated_ranks
+        self.identifiable_country = identifiable_country 
     
     def get_text_path(self, file_to_use: str) -> str:
         curr_path = os.getcwd()
@@ -29,21 +30,32 @@ class ChatCreation:
         replacements_path = os.path.join(wargame_folder_path, replacement_to_use)
 
         return replacements_path
+    
+    def _pick_replacement(self):
+        if self.explicit_country and self.identifiable_country == 'Taiwan':
+            replacement_file = 'replacement_explicit.json'
+        elif self.explicit_country and self.identifiable_country == 'Ukraine':
+            replacement_file = 'replacement_explicit_ukraine.json'
+        elif self.explicit_country and self.identifiable_country == 'Cyprus':
+            replacement_file = 'replacement_explicit_cyprus.json'
+        elif self.explicit_country and self.identifiable_country == 'India':
+            replacement_file = 'replacement_explicit_sircreek.json'
+        elif self.explicit_country and self.identifiable_country == 'Norway':
+            replacement_file = 'replacement_explicit_norway.json'
+        elif not self.explicit_country:
+            replacement_file = 'replacement_anonymous.json'
+        
+        return replacement_file
 
     def create_system_prompt(self):
         if self.control_level == 'free':
             file_to_use = 'system_free_v4.txt'
         elif self.control_level == 'rank':
             file_to_use = 'system_options_v4.txt'
-        elif self.control_level == 'nudge':
-            file_to_use = 'system_nudge.txt'
         else:
             raise FileNotFoundError('Invalid control_level')
         
-        if self.explicit_country:
-            replacement_file = 'replacement_explicit.json'
-        else:
-            replacement_file = 'replacement_anonymous.json'
+        replacement_file = self._pick_replacement()
         
         file_to_use_path = self.get_text_path(file_to_use)
         replacement_to_use_path = self.get_replacement_path(replacement_file)
@@ -63,11 +75,11 @@ class ChatCreation:
         # avail_forces = 'available_forces.txt'
 
         if self.explicit_country:
-            replacement_file = 'replacement_explicit.json'
             nation_description = None
         else:
-            replacement_file = 'replacement_anonymous.json'
             nation_description = 'nation_descriptions.txt'
+        
+        replacement_file = self._pick_replacement()
         
         # go through directory to find path for file
         scenario_path = self.get_text_path(scenario)
@@ -178,13 +190,13 @@ class ChatCreation:
 
 
 if __name__ == '__main__':
-    x = ChatCreation('rank', True, 'status quo', ablated_ranks='reversed')
+    x = ChatCreation(identifiable_country='Ukraine')
     y = x.move_1()
-    # print(y[0]['content'], y[1]['content'])
+    print(y[0]['content'], y[1]['content'])
     # print('---------------------')
-    x.move_2(y)
-    for chat in y:
-        print(chat['content'])
+    # x.move_2(y)
+    # for chat in y:
+    #     print(chat['content'])
     
 
 
