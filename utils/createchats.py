@@ -59,6 +59,7 @@ class ChatCreation:
         
         file_to_use_path = self.get_text_path(file_to_use)
         replacement_to_use_path = self.get_replacement_path(replacement_file)
+        print(replacement_to_use_path)
 
         with open(replacement_to_use_path, 'r') as f:
             replacements = json.load(f)
@@ -118,10 +119,7 @@ class ChatCreation:
             elif self.ablated_ranks == 'reversed':
                 question = 'question_options_v4_reversed.txt'
 
-        if self.explicit_country:
-            replacement_file = 'replacement_explicit.json'
-        else:
-            replacement_file = 'replacement_anonymous.json'
+        replacement_file = self._pick_replacement()
 
         incident_path = self.get_text_path(incident)
         question_path = self.get_text_path(question)
@@ -190,9 +188,9 @@ class ChatCreation:
 
 
 if __name__ == '__main__':
-    x = ChatCreation(identifiable_country='Ukraine')
+    x = ChatCreation(identifiable_country='Cyprus')
     y = x.move_1()
-    print(y[0]['content'], y[1]['content'])
+    print(y[1]['content'])
     # print('---------------------')
     # x.move_2(y)
     # for chat in y:
