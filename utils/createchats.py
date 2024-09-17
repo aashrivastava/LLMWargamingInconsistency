@@ -200,7 +200,7 @@ class ChatCreation:
 
 
 if __name__ == '__main__':
-    x = ChatCreation(identifiable_country='Cyprus', role='automated')
+    x = ChatCreation(identifiable_country='India', role='recommender')
     y = x.move_1()
     print(y[0]['content'])
     print('----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
