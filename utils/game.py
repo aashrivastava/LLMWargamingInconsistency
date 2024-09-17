@@ -16,7 +16,7 @@ class GameSimulator:
     '''
     IMPLEMENT DOCSTRING
     '''
-    def __init__(self, model, control_level='free', explicit_country=True, adversary_response='revisionist', temperature=1.0, N_responses=20, identifiable_country='Taiwan', ablated_ranks=False):
+    def __init__(self, model, control_level='free', explicit_country=True, adversary_response='revisionist', temperature=1.0, N_responses=20, identifiable_country='Taiwan', role='president', ablated_ranks=False):
         assert control_level.lower() in ['free', 'rank', 'nudge']
         self.model = model
         self.control_level = control_level
@@ -26,10 +26,12 @@ class GameSimulator:
         self.temperature = temperature
         self.ablated_ranks = ablated_ranks
         self.identifiable_country = identifiable_country
+        self.role = role
         self.chatcreator = ChatCreation(control_level=self.control_level, 
                                         explicit_country=self.explicit_country, 
                                         adversary_response=self.adversary_response, 
                                         identifiable_country=self.identifiable_country,
+                                        role=self.role,
                                         ablated_ranks=self.ablated_ranks)
         if self.model != 'dummy' and ('gpt' in self.model):
             self.prompter = OpenAIPrompting(model=self.model)
@@ -39,6 +41,38 @@ class GameSimulator:
             self.prompter = LlamaPrompting(model=self.model)
         else:
             self.prompter = None
+    
+    def run_basic_oai_inital_setting(self):
+        assert 'gpt' in self.model
+
+        responses = []
+        first_prompt = self.chatcreator.move_1()
+        curr_chat = first_prompt
+
+        if self.prompter:
+            print('Getting completions...')
+            move1_completions = self.prompter.get_completions(curr_chat, N_responses=self.N_responses, temperature=self.temperature)
+            outputs_1 = self.prompter.parse_outputs(move1_completions)
+            print('Got completions')
+            responses.append(outputs_1)
+        
+        return responses, curr_chat
+    
+    def run_basic_anthropic_initial_setting(self):
+        assert 'claude' in self.model
+
+        responses = []
+        first_prompt = self.chatcreator.move_1()
+        system_prompt, curr_chat = first_prompt[0]['content'], first_prompt[1:]
+
+        if self.prompter:
+            print('Getting move 1 completions...')
+            move1_completions = self.prompter.get_completions(system_prompt, curr_chat, N_responses=self.N_responses, temperature=self.temperature)
+            outputs_1 = self.prompter.parse_outputs(move1_completions)
+            print('Got completions')
+            responses.append(outputs_1)
+        
+        return responses, curr_chat
     
     def run_basic_oai(self):
         assert 'gpt' in self.model
@@ -249,7 +283,7 @@ class GameSimulator:
 
         return curr_chat, responses, weird_outputs, reasoning
     
-    def write_chat(self, chat: list[dict[str, str]], save_dir: str, f_name: str):
+    def write_chat(self, chat: list[dict[str, str]], save_dir: str, f_name: str='chat'):
         '''
         docstring
         '''

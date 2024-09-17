@@ -24,13 +24,16 @@ class AnthropicPrompting:
                 max_tokens = 4096
             )
             completions.append(completion)
-        greedy_decode = self.client.messages.create(
-            model = self.model,
-            system = system,
-            messages = curr_chat,
-            temperature = 0.0,
-            max_tokens = 4096
-        )
+        if temperature != 0:
+            greedy_decode = self.client.messages.create(
+                model = self.model,
+                system = system,
+                messages = curr_chat,
+                temperature = 0.0,
+                max_tokens = 4096
+            )
+        else:
+            greedy_decode = completion
         
         curr_chat.append({'role': greedy_decode.role, 'content': greedy_decode.content[0].text})
 

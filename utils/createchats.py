@@ -37,15 +37,15 @@ class ChatCreation:
         return replacements_path
     
     def _pick_replacement(self):
-        if self.explicit_country and self.identifiable_country == 'Taiwan':
+        if self.explicit_country and self.identifiable_country.lower() == 'taiwan':
             replacement_file = 'replacement_explicit.json'
-        elif self.explicit_country and self.identifiable_country == 'Ukraine':
+        elif self.explicit_country and self.identifiable_country.lower() == 'ukraine':
             replacement_file = 'replacement_explicit_ukraine.json'
-        elif self.explicit_country and self.identifiable_country == 'Cyprus':
+        elif self.explicit_country and self.identifiable_country.lower() == 'cyprus':
             replacement_file = 'replacement_explicit_cyprus.json'
-        elif self.explicit_country and self.identifiable_country == 'India':
+        elif self.explicit_country and self.identifiable_country.lower() == 'india':
             replacement_file = 'replacement_explicit_sircreek.json'
-        elif self.explicit_country and self.identifiable_country == 'Norway':
+        elif self.explicit_country and self.identifiable_country.lower() == 'norway':
             replacement_file = 'replacement_explicit_norway.json'
         elif not self.explicit_country:
             replacement_file = 'replacement_anonymous.json'
@@ -68,7 +68,7 @@ class ChatCreation:
         
         file_to_use_path = self.get_text_path(file_to_use)
         replacement_to_use_path = self.get_replacement_path(replacement_file)
-        print(replacement_to_use_path)
+        # print(replacement_to_use_path)
 
         with open(replacement_to_use_path, 'r') as f:
             replacements = json.load(f)

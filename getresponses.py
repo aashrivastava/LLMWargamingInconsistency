@@ -51,14 +51,48 @@ def run_main(model, explicit_country, response_env, adversary_response, temperat
         simulator.write_outputs(outputs, f'{o_directory}/run{i}', f_name=o_file)
     
     simulator.write_chat(chats, o_directory, 'chat')
-        
+
+
+def run_initial_setting(model, o_dir, f_name, explicit_country=True, response_env='free', temperature=1.0, N_responses=20, identifiable_country='Taiwan', role='president', ablated_ranks=False):
+    '''
+    Runs the "INITIAL SETTING" experiment. This will do everythign from prompting the model to writing the response(s) to a specified directory `o_dir`
+    '''
+    # makes sure model is supported
+    assert 'claude' in model or 'gpt' in model
+
+    o_dir = os.path.abspath(o_dir)
+
+    simulator = GameSimulator(model, control_level=response_env, explicit_country=explicit_country, identifiable_country=identifiable_country, role=role,
+                              temperature=temperature, N_responses=N_responses, ablated_ranks=ablated_ranks)
+    
+    if 'claude' in model:
+        outputs, chat = simulator.run_basic_anthropic_initial_setting()
+        print(outputs)
+        print('')
+        print(chat[-1]['content'])
+    elif 'gpt' in model:
+        outputs, chat = simulator.run_basic_oai_inital_setting()
+        print(outputs)
+        print('')
+        print(chat[-1]['content'])
+    
+    simulator.write_outputs(outputs, o_dir, f_name=f_name)
+    simulator.write_chat(chat, o_dir, f_name=f'chats/CHAT-{f_name}')
+    
         
 perms = [
-    ['claude-3-5-sonnet-20240620', True, 'free', 'status quo', 1.0, 20, 19, 20],
+    'taiwan',
+    'cyprus',
+    'norway',
+    'india',
+    'ukraine'
 ]
 if __name__ == '__main__':
-    for perm in perms:
-        run_main(perm[0], perm[1], perm[2], perm[3], temperature=perm[4], N_responses=perm[5], start=perm[6], end=perm[7])
+    for model in [('claude-3-5-sonnet-20240620', 'claude-3.5-sonnet')]:
+        for role in ['automated']:
+            for perm in perms:
+                run_initial_setting(model[0], f'main_logging/{model[1]}', f'{perm}-{role}', temperature=0.0, N_responses=1, identifiable_country=perm, role=role)
+                print('------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
 
 
 # def run_20_simuls_rank(model, explicit_country, start, end):

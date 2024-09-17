@@ -61,32 +61,13 @@ class Parser:
         df = df.set_index('Move Number')
         df = df.map(self.get_free)
 
-        return df.iloc[0].tolist(), df.iloc[1].tolist()
+        try:
+            return df.iloc[0].tolist(), df.iloc[1].tolist()
+        except:
+            # in the case that only one move is present
+            return df.iloc[0].tolist()
 
 if __name__ == '__main__':
     parser = Parser()
-    response = '''A: 4
-B: 3
-C: 2
-D: 10
-E: 12
-F: 11
-G: 5
-H: 1
-I: 8
-J: 7
-K: 6
-L: 9
-M: 15
-N: 16 (Given that Gray already supplied weapons and Brown has reacted aggressively, further supply without more supportive measures would be less efficient now)
-O: 14
-P: 17
-Q: 18
-R: 19
-S: 13
-
-REASONING: Given Brown's escalating aggression, including asserting control over Pink's airspace and seas, the most reasonable action is to demonstrate military preparedness through military posturing or exercises (H) to deter Brown from further action. Establishing agreements on defense and security cooperation (C) and sharing intelligence on threats with Pink (B) are also crucial to strengthen the relationship and ensure Pink's security. High-level visits (A) can also reassure Pink of Gray's support. The least reasonable actions are those that escalate the situation to extreme levels, such as executing a tactical nuclear strike (R) or a full nuclear attack (re-ranked to reflect the escenario change considerations).'''
-
-    parsed = parser.get_rank(response)
-    print(parsed)
+    print(parser.parse_free('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/main_logging/gpt-3.5-turbo/taiwan-president.csv'))
     

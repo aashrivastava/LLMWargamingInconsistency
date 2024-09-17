@@ -10,12 +10,12 @@ beval = BERTScoreEval()
 
 
 paths = [
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/claude35sonnet/free/status_quo/claude35sonnet-free-True-20-1.0/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini/free/revisionist/gpt4omini-free-True-20-0.0/main', ''),
 ]
 
 
 for path in tqdm(paths, desc='Running through models...'):
-    for i in tqdm(range(19, 21)):
+    for i in tqdm(range(1, 2)):
         m1, m2 = parser.parse_free(f'{path[0]}/run{i}/run{i}{path[1]}.csv')
         
         t0 = time.time()
@@ -24,6 +24,8 @@ for path in tqdm(paths, desc='Running through models...'):
         print(f'RUN {i}: Got both moves in {t1 - t0:.2f} seconds')
 
         berts1, berts2 = berts1.numpy(), berts2.numpy()
+        print(np.mean(berts1))
+        print(np.mean(berts2))
 
         np.savez(f'{path[0]}/run{i}/run{i}_berts.npz',
             move1=berts1,
