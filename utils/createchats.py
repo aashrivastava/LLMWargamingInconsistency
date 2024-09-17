@@ -6,14 +6,19 @@ class ChatCreation:
     '''
     IMPLEMENT DOCSTRING
     '''
-    def __init__(self, control_level='free', explicit_country=True, adversary_response='revisionist', identifiable_country='Taiwan', ablated_ranks=False):
+    def __init__(self, control_level='free', explicit_country=True, adversary_response='revisionist', identifiable_country='Taiwan', role='president', ablated_ranks=False):
         assert control_level in ['free', 'rank', 'nudge']
+        assert explicit_country in [True, False]
+        assert adversary_response in ['revisionist', 'status quo']
+        assert identifiable_country.lower() in ['taiwan', 'cyprus', 'norway', 'india', 'ukraine']
+        assert role.lower() in ['president', 'automated', 'recommender']
 
         self.control_level = control_level
         self.explicit_country = explicit_country
         self.adversary_response = adversary_response
         self.ablated_ranks = ablated_ranks
         self.identifiable_country = identifiable_country 
+        self.role = role
     
     def get_text_path(self, file_to_use: str) -> str:
         curr_path = os.getcwd()
@@ -48,8 +53,12 @@ class ChatCreation:
         return replacement_file
 
     def create_system_prompt(self):
-        if self.control_level == 'free':
+        if self.control_level == 'free' and self.role == 'president':
             file_to_use = 'system_free_v4.txt'
+        elif self.control_level == 'free' and self.role == 'automated':
+            file_to_use = 'system_free_automated.txt'
+        elif self.control_level == 'free' and self.role == 'recommender':
+            file_to_use = 'system_free_recommender.txt'
         elif self.control_level == 'rank':
             file_to_use = 'system_options_v4.txt'
         else:
@@ -110,10 +119,13 @@ class ChatCreation:
         incident = 'incident_move1.txt'
 
         if self.control_level == 'free':
-            question = 'question_free_v4.txt'
-        elif self.control_level == 'nudge':
-            question = 'question_nudge.txt'
-        else:
+            if self.role == 'president':
+                question = 'question_free_v4.txt'
+            elif self.role == 'automated':
+                question = 'question_free_automated.txt'
+            elif self.role == 'recommender':
+                question = 'question_free_recommender.txt'
+        elif self.control_level == 'rank':
             if not self.ablated_ranks:
                 question = 'question_options_v4.txt'
             elif self.ablated_ranks == 'reversed':
@@ -188,8 +200,10 @@ class ChatCreation:
 
 
 if __name__ == '__main__':
-    x = ChatCreation(identifiable_country='Cyprus')
+    x = ChatCreation(identifiable_country='Cyprus', role='automated')
     y = x.move_1()
+    print(y[0]['content'])
+    print('----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
     print(y[1]['content'])
     # print('---------------------')
     # x.move_2(y)
