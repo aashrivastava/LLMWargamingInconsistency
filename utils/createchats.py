@@ -6,7 +6,7 @@ class ChatCreation:
     '''
     IMPLEMENT DOCSTRING
     '''
-    def __init__(self, control_level='free', explicit_country=True, adversary_response='revisionist', identifiable_country='Taiwan', role='president', ablated_ranks=False):
+    def __init__(self, control_level='free', explicit_country=True, adversary_response='revisionist', identifiable_country='Taiwan', role='president', decision_country='ally', ablated_ranks=False):
         assert control_level in ['free', 'rank', 'nudge']
         assert explicit_country in [True, False]
         assert adversary_response in ['revisionist', 'status quo']
@@ -19,6 +19,7 @@ class ChatCreation:
         self.ablated_ranks = ablated_ranks
         self.identifiable_country = identifiable_country 
         self.role = role
+        self.decision_country = decision_country
     
     def get_text_path(self, file_to_use: str) -> str:
         curr_path = os.getcwd()
@@ -28,7 +29,7 @@ class ChatCreation:
 
         return file_to_use_path
     
-    def get_replacement_path(self, replacement_to_use: str) -> str:
+    def _get_replacement_path(self, replacement_to_use: str) -> str:
         curr_path = os.getcwd()
         parent_directory = os.path.dirname(curr_path)
         wargame_folder_path = os.path.join(parent_directory, 'LLMWargamingConfidence/wargame')
@@ -50,7 +51,22 @@ class ChatCreation:
         elif not self.explicit_country:
             replacement_file = 'replacement_anonymous.json'
         
-        return replacement_file
+        replacement_to_use_path = self._get_replacement_path(replacement_file)
+        
+        with open(replacement_to_use_path, 'r') as f:
+            replacements = json.load(f)
+        
+        if self.decision_country.lower() == 'ally':
+            replacements["DECISION_COUNTRY"] = replacements["ALLY"]
+        elif self.decision_country.lower() == 'adversary':
+            replacements["DECISION_COUNTRY"] = replacements["ADVERSARY"]
+        elif self.decision_country.lower() == 'aggrieved':
+            replacements["DECISION_COUNTRY"] = replacements["AGGRIEVED"]
+        else:
+            raise Exception('Specified Decision Country Invalid')
+
+        
+        return replacements
 
     def create_system_prompt(self):
         if self.control_level == 'free' and self.role == 'president':
@@ -64,14 +80,10 @@ class ChatCreation:
         else:
             raise FileNotFoundError('Invalid control_level')
         
-        replacement_file = self._pick_replacement()
+        replacements = self._pick_replacement()
         
         file_to_use_path = self.get_text_path(file_to_use)
-        replacement_to_use_path = self.get_replacement_path(replacement_file)
         # print(replacement_to_use_path)
-
-        with open(replacement_to_use_path, 'r') as f:
-            replacements = json.load(f)
         
         with open(file_to_use_path, 'r') as f:
             system_prompt = f.read()
@@ -89,7 +101,7 @@ class ChatCreation:
         else:
             nation_description = 'nation_descriptions.txt'
         
-        replacement_file = self._pick_replacement()
+        replacements = self._pick_replacement()
         
         # go through directory to find path for file
         scenario_path = self.get_text_path(scenario)
@@ -98,11 +110,6 @@ class ChatCreation:
             nation_desc_path = self.get_text_path(nation_description)
         else:
             nation_desc_path = None
-        replacement_to_use_path = self.get_replacement_path(replacement_file)
-
-
-        with open(replacement_to_use_path, 'r') as f:
-            replacements = json.load(f)
         
         try:
             with open(scenario_path, 'r') as f1, open(nation_desc_path, 'r') as f3: #open(avail_forces_path, 'r') as f2, 
@@ -131,14 +138,10 @@ class ChatCreation:
             elif self.ablated_ranks == 'reversed':
                 question = 'question_options_v4_reversed.txt'
 
-        replacement_file = self._pick_replacement()
+        replacements = self._pick_replacement()
 
         incident_path = self.get_text_path(incident)
         question_path = self.get_text_path(question)
-        replacement_to_use_path = self.get_replacement_path(replacement_file)
-
-        with open(replacement_to_use_path, 'r') as f:
-            replacements = json.load(f)
         
         with open(incident_path, 'r') as f1, open(question_path, 'r') as f2:
             
@@ -200,7 +203,7 @@ class ChatCreation:
 
 
 if __name__ == '__main__':
-    x = ChatCreation(identifiable_country='India', role='recommender')
+    x = ChatCreation(identifiable_country='India', role='automated', decision_country='adversary')
     y = x.move_1()
     print(y[0]['content'])
     print('----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
