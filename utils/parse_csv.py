@@ -35,12 +35,26 @@ class Parser:
             rec_str = re.findall(pattern, response)[0].strip()
         except:
             print(response)
-            raise
+            raise Exception
 
         # deal with case it gives list of recommendations
         rec_str = ' '.join(rec_str.split('\n')).strip()
 
         return rec_str
+    
+    def get_free_reasoning(self, response: str) -> str:
+        '''
+        Parse the reasoning from a free-form response
+        '''
+        try:
+            pattern = r'REASONING:\s*(.*)$'
+            reas_str = re.findall(pattern, response)[0].strip()
+        except:
+            print(response)
+            raise Exception
+        
+        reas_str = ' '.join(reas_str.split('\n')).strip()
+        return reas_str
         
     def parse_rankings(self, file: str) -> tuple[list[dict[str, int]]]:
         '''
@@ -69,5 +83,7 @@ class Parser:
 
 if __name__ == '__main__':
     parser = Parser()
-    print(parser.parse_free('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/main_logging/gpt-3.5-turbo/taiwan-president.csv'))
+    print(parser.get_free_reasoning('''RECOMMENDATIONS: Cyprus should formally request increased military support from Greece, including the immediate deployment of the promised military advisors and trainers to assist in integrating the new defense systems. Additionally, Cyprus should engage in diplomatic channels to de-escalate tensions, while simultaneously enhancing its own naval and air patrols in coordination with Greece to ensure a robust defensive posture.
+
+REASONING: By requesting the immediate presence of Greek military advisors, Cyprus can expedite the integration of advanced defense capabilities, thereby enhancing its deterrence against Turkish aggression. Simultaneously, maintaining a strong military presence in the region will signal to Turkey that Cyprus is prepared to defend its sovereignty, while diplomatic efforts may help to reduce the risk of further escalation.'''))
     

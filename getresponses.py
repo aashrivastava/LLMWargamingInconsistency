@@ -53,7 +53,7 @@ def run_main(model, explicit_country, response_env, adversary_response, temperat
     simulator.write_chat(chats, o_directory, 'chat')
 
 
-def run_initial_setting(model, o_dir, f_name, explicit_country=True, response_env='free', temperature=1.0, N_responses=20, identifiable_country='Taiwan', role='president', ablated_ranks=False):
+def run_initial_setting(model, o_dir, f_name, explicit_country=True, response_env='free', temperature=1.0, N_responses=20, identifiable_country='Taiwan', role='president', decision_country='ally', ablated_ranks=False):
     '''
     Runs the "INITIAL SETTING" experiment. This will do everythign from prompting the model to writing the response(s) to a specified directory `o_dir`
     '''
@@ -62,7 +62,7 @@ def run_initial_setting(model, o_dir, f_name, explicit_country=True, response_en
 
     o_dir = os.path.abspath(o_dir)
 
-    simulator = GameSimulator(model, control_level=response_env, explicit_country=explicit_country, identifiable_country=identifiable_country, role=role,
+    simulator = GameSimulator(model, control_level=response_env, explicit_country=explicit_country, identifiable_country=identifiable_country, role=role, decision_country=decision_country,
                               temperature=temperature, N_responses=N_responses, ablated_ranks=ablated_ranks)
     
     if 'claude' in model:
@@ -88,10 +88,14 @@ perms = [
     'ukraine'
 ]
 if __name__ == '__main__':
-    for model in [('claude-3-5-sonnet-20240620', 'claude-3.5-sonnet')]:
-        for role in ['automated']:
+    for model in [('gpt-4o-mini', 'gpt-4o-mini'),
+                  ('claude-3-5-sonnet-20240620', 'claude-3.5-sonnet'),
+                  ('gpt-4-0613', 'gpt-4'),
+                  ('gpt-3.5-turbo', 'gpt-3.5-turbo'),
+                  ('gpt-4o', 'gpt-4o')]:
+        for role in ['president', 'automated']:
             for perm in perms:
-                run_initial_setting(model[0], f'main_logging/{model[1]}', f'{perm}-{role}', temperature=0.0, N_responses=1, identifiable_country=perm, role=role)
+                run_initial_setting(model[0], f'main_logging/{model[1]}', f'{perm}-{role}-aggrieved', temperature=0.0, N_responses=1, identifiable_country=perm, role=role, decision_country='aggrieved')
                 print('------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
 
 
