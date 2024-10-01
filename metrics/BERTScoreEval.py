@@ -143,12 +143,12 @@ if __name__ == '__main__':
     # 
     # ref = 'I want to drive a Mercedes Benz. I also think we should go take down their communications'
 
-    ref = "Eating watermelon seeds is generally safe, as they can pass through your digestive system without causing harm, although some people believe they may cause stomach discomfort or sprout in your stomach, which is a myth."
+    ref = "i eat apples"
 
-    cand = "Eating watermelon seeds is typically safe, as they can move through your digestive system without causing harm, although some individuals believe they may cause stomach discomfort or germinate in your stomach, which is a myth."
+    cand = "she dislikes driving"
 
     
-    F1_1 = evaluator.regular_score([ref], [cand])
+    F1_1 = evaluator.regular_score([ref], [cand]).item()
     print(F1_1)
     # print(torch.mean(F1_1))
 

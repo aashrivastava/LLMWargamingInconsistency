@@ -7,7 +7,7 @@ class ChatCreation:
     '''
     IMPLEMENT DOCSTRING
     '''
-    def __init__(self, control_level='free', explicit_country=True, adversary_response='revisionist', identifiable_country='Taiwan', role='president', decision_country='ally', ablated_ranks=False):
+    def __init__(self, control_level='free', explicit_country=True, adversary_response='revisionist', identifiable_country='Taiwan', role='president', decision_country='ally', ablated_free=False, ablated_ranks=False):
         assert control_level in ['free', 'rank', 'nudge']
         assert explicit_country in [True, False]
         assert adversary_response in ['revisionist', 'status quo']
@@ -21,6 +21,7 @@ class ChatCreation:
         self.identifiable_country = identifiable_country 
         self.role = role
         self.decision_country = decision_country
+        self.ablated_free = ablated_free
     
     def get_text_path(self, file_to_use: str) -> str:
         curr_path = os.getcwd()
@@ -239,7 +240,10 @@ class ChatCreation:
     
     def move_1(self) -> list[dict[str, str]]:
         system_prompt = self.create_system_prompt()
-        first_message = self.create_context() + self.create_incident1_and_question()
+        if not self.ablated_free:
+            first_message = self.create_context() + self.create_incident1_and_question()
+        else:
+            first_message = self.create_context_ablated() + self.create_incident1_and_question_ablated()
 
         return [
             {'role': 'system', 'content': system_prompt},
@@ -289,12 +293,11 @@ class ChatCreation:
 
 
 if __name__ == '__main__':
-    x = ChatCreation(identifiable_country='India', role='automated', decision_country='adversary')
-    y = x.create_context_ablated()
-    print(y)
-    # print(y[0]['content'])
+    x = ChatCreation(ablated_free=True)
+    y = x.move_1()
+    print(y[0]['content'])
     # print('----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
-    # print(y[1]['content'])
+    print(y[1]['content'])
     # print('---------------------')
     # x.move_2(y)
     # for chat in y:

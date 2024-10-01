@@ -10,26 +10,25 @@ beval = BERTScoreEval()
 
 
 paths = [
-    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/logging/outputs/v4/gpt4omini/free/revisionist/gpt4omini-free-True-20-0.0/main', ''),
+    ('/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/main_logging/temperature_ablations/gpt-4o/temp_1.2', ''),
 ]
 
 
-for path in tqdm(paths, desc='Running through models...'):
-    for i in tqdm(range(1, 2)):
-        m1, m2 = parser.parse_free(f'{path[0]}/run{i}/run{i}{path[1]}.csv')
+for path in paths:
+    for i in tqdm(range(1, 21)):
+        m1 = parser.parse_free(f'{path[0]}/temp_1.2_{i}.csv')
         
         t0 = time.time()
-        berts1, berts2 = beval.get_berts_within(m1), beval.get_berts_within(m2)
+        berts1 = beval.get_berts_within(m1)
         t1 = time.time()
         print(f'RUN {i}: Got both moves in {t1 - t0:.2f} seconds')
 
-        berts1, berts2 = berts1.numpy(), berts2.numpy()
+        berts1 = berts1.numpy()
         print(np.mean(berts1))
-        print(np.mean(berts2))
+        # print(np.mean(berts2))
 
-        np.savez(f'{path[0]}/run{i}/run{i}_berts.npz',
-            move1=berts1,
-            move2=berts2)
+        np.savez(f'{path[0]}/BERTS-temp_1.2_{i}.npz',
+            move1=berts1)
 
         
         

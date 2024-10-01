@@ -53,7 +53,7 @@ def run_main(model, explicit_country, response_env, adversary_response, temperat
     simulator.write_chat(chats, o_directory, 'chat')
 
 
-def run_initial_setting(model, o_dir, f_name, explicit_country=True, response_env='free', temperature=1.0, N_responses=20, identifiable_country='Taiwan', role='president', decision_country='ally', ablated_ranks=False):
+def run_initial_setting(model, o_dir, f_name, explicit_country=True, response_env='free', temperature=1.0, N_responses=20, identifiable_country='Taiwan', role='president', decision_country='ally', ablated_free=False, ablated_ranks=False, get_chats=True):
     '''
     Runs the "INITIAL SETTING" experiment. This will do everythign from prompting the model to writing the response(s) to a specified directory `o_dir`
     '''
@@ -63,41 +63,38 @@ def run_initial_setting(model, o_dir, f_name, explicit_country=True, response_en
     o_dir = os.path.abspath(o_dir)
 
     simulator = GameSimulator(model, control_level=response_env, explicit_country=explicit_country, identifiable_country=identifiable_country, role=role, decision_country=decision_country,
-                              temperature=temperature, N_responses=N_responses, ablated_ranks=ablated_ranks)
+                              temperature=temperature, N_responses=N_responses, ablated_free=ablated_free, ablated_ranks=ablated_ranks)
     
     if 'claude' in model:
         outputs, chat = simulator.run_basic_anthropic_initial_setting()
-        print(outputs)
-        print('')
-        print(chat[-1]['content'])
+        # print(outputs)
+        # print('')
+        # print(chat[-1]['content'])
     elif 'gpt' in model:
         outputs, chat = simulator.run_basic_oai_inital_setting()
-        print(outputs)
-        print('')
-        print(chat[-1]['content'])
+        # print(outputs)
+        # print('')
+        # print(chat[-1]['content'])
     
     simulator.write_outputs(outputs, o_dir, f_name=f_name)
-    simulator.write_chat(chat, o_dir, f_name=f'chats/CHAT-{f_name}')
-    
-        
-perms = [
-    'taiwan',
-    'cyprus',
-    'norway',
-    'india',
-    'ukraine'
-]
-if __name__ == '__main__':
-    for model in [('gpt-4o-mini', 'gpt-4o-mini'),
-                  ('claude-3-5-sonnet-20240620', 'claude-3.5-sonnet'),
-                  ('gpt-4-0613', 'gpt-4'),
-                  ('gpt-3.5-turbo', 'gpt-3.5-turbo'),
-                  ('gpt-4o', 'gpt-4o')]:
-        for role in ['president', 'automated']:
-            for perm in perms:
-                run_initial_setting(model[0], f'main_logging/{model[1]}', f'{perm}-{role}-aggrieved', temperature=0.0, N_responses=1, identifiable_country=perm, role=role, decision_country='aggrieved')
-                print('------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
+    if get_chats:
+        try:
+            simulator.write_chat(chat, o_dir, f_name=f'chats/CHAT-{f_name}')
+        except FileNotFoundError:
+            os.makedirs(f'{o_dir}/chats')
+            simulator.write_chat(chat, o_dir, f_name=f'chats/CHAT-{f_name}')
+    else:
+        pass
 
+models = [
+    ('gpt-4o', 'gpt-4o')
+]
+        
+if __name__ == '__main__':
+    for m in models:
+        for temp in [1.2]:
+            for i in range(19):
+                run_initial_setting(m[0], f'/Users/aryanshrivastava/Desktop/LLMWargamingConfidence/main_logging/temperature_ablations/{m[-1]}/temp_{temp}', f'temp_{temp}_{i+2}', temperature=temp, get_chats=False)
 
 # def run_20_simuls_rank(model, explicit_country, start, end):
 #     if model != 'dummy' and 'claude' in model:
