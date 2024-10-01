@@ -39,9 +39,3 @@ class EvaluatorBasics:
         unique_pairs = [(response_i, responses[j]) for i, response_i in tqdm(enumerate(responses), desc='Creating Pairs...', disable=not verbose) for j in range(i+1, len(responses))]
 
         return unique_pairs
-
-if __name__ == '__main__':
-    create = EvaluatorBasics()
-    pairs = create.create_unique_pairs(['a', 'b', 'c', 'd', 'e', 'f'])
-
-    print(pairs)

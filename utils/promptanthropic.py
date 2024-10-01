@@ -47,12 +47,4 @@ class AnthropicPrompting:
 
         return responses
 
-if __name__ == '__main__':
-    a = AnthropicPrompting()
-    system = 'Respond as a teenager'
-    curr_chat = [{'role': 'user', 'content': 'hello'}]
-    comps = a.get_completions(system, curr_chat, N_responses=2)
-    responses = a.parse_outputs(comps)
-    for r in responses:
-        print(r)
 

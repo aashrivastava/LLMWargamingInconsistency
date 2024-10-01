@@ -80,10 +80,3 @@ class Parser:
         except:
             # in the case that only one move is present
             return df.iloc[0].tolist()
-
-if __name__ == '__main__':
-    parser = Parser()
-    print(parser.get_free_reasoning('''RECOMMENDATIONS: Cyprus should formally request increased military support from Greece, including the immediate deployment of the promised military advisors and trainers to assist in integrating the new defense systems. Additionally, Cyprus should engage in diplomatic channels to de-escalate tensions, while simultaneously enhancing its own naval and air patrols in coordination with Greece to ensure a robust defensive posture.
-
-REASONING: By requesting the immediate presence of Greek military advisors, Cyprus can expedite the integration of advanced defense capabilities, thereby enhancing its deterrence against Turkish aggression. Simultaneously, maintaining a strong military presence in the region will signal to Turkey that Cyprus is prepared to defend its sovereignty, while diplomatic efforts may help to reduce the risk of further escalation.'''))
-    

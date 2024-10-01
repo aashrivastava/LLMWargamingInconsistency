@@ -210,13 +210,3 @@ class BiDirectionalEntailmentEval(EvaluatorBasics):
                 tot += (N - len(c))
         
         return tot / (N ** 2 - N)
-
-if __name__ == '__main__':
-    evaluator = BiDirectionalEntailmentEval(model='microsoft/deberta-v2-xlarge-mnli')
-    responses = ['We have to eat', 'We have to eat', 'We have to eat', 'I like cars', 'I like cars', 'Cats are cool']
-
-
-
-    score = evaluator.aggregate(responses, verbose=True)
-    print(f'The unalikeness metric is: {score: .2f}')
-

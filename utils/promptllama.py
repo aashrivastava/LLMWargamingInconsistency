@@ -28,16 +28,3 @@ class LlamaPrompting:
 
         curr_chat.append({'role': 'assistant', 'content': greedy_decode.choices[0].message.content})
         return completions
-
-if __name__ == '__main__':
-    # llama is ***bad*** at ranking
-    x = LlamaPrompting('meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo')
-    messages = [
-        {'role': 'system',
-         'content': 'say hello in 5 words!'},
-        {'role': 'user',
-         'content': 'Hello!'}
-    ]
-    y = x.get_completions(messages, N_responses=2)
-    print(y.choices[0].message.role)
-    print(y.choices[0].message.content)

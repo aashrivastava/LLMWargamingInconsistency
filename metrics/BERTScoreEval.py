@@ -1,6 +1,5 @@
 from bert_score import BERTScorer
 import torch # to work with outputted tensors given by BERTScore
-# from transformers import AutoTokenizer (probably)
 import typing
 # import promptopenai so that each metric can inherit the prompting so that you don't have to call
 from tqdm.auto import tqdm # progress bar
@@ -10,12 +9,6 @@ import math
 import numpy as np
 import time
 
-## WHAT TO DO FOR LATER/TOMORROW
-## ___PRESSING___
-# connect promptopenai to these
-# confirm that my aggregation is reasonable
-## ___NICE TO HAVE___
-# get a baseline for texts
 
 class BERTScoreEval(EvaluatorBasics):
     '''
@@ -135,23 +128,6 @@ class BERTScoreEval(EvaluatorBasics):
         else:
             return min(tot / math.comb(N, 2), 1.0)
     
-    
-# for my purposes 
-if __name__ == '__main__':
-    evaluator = BERTScoreEval()
-    # to test
-    # 
-    # ref = 'I want to drive a Mercedes Benz. I also think we should go take down their communications'
 
-    ref = "i eat apples"
-
-    cand = "she dislikes driving"
-
-    
-    F1_1 = evaluator.regular_score([ref], [cand]).item()
-    print(F1_1)
-    # print(torch.mean(F1_1))
-
-    # print(f'{F1_1}: Completed in {end-start:.2f} seconds')
 
     

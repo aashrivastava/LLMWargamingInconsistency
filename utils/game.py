@@ -340,17 +340,3 @@ class GameSimulator:
             writer.writerow(header)
             for label, move_i_responses in zip(labels, reasoning):
                 writer.writerow([label] + move_i_responses)
-
-if __name__ == '__main__':
-    play = GameSimulator('gpt-3.5-turbo', 'free', False, N_responses=2, temperature=1.0)
-    run = play.run()
-    responses = run[1]
-    chat_hist = run[0]
-    with open('responses.txt', 'w') as file:
-        for i, sublist in enumerate(responses):
-            file.write('## MOVE {i+1}' + '\n\n')
-            for response in sublist:
-                file.write(response + '\n')
-
-    with open('chat.json', 'w') as json_file:
-        json.dump(chat_hist, json_file, indent=4)

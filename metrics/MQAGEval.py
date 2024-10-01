@@ -76,12 +76,4 @@ class MQAGEval(EvaluatorBasics):
         
         return tot / math.comb(N, 2)
     
-if __name__ == '__main__':
-    evaluator = MQAGScoreEval()
-    ref = 'I think we should go to the store'
-    contradict = 'I do not think we should go to the store'
-    neutral = 'The mercedes is a good car'
-    entails = 'I believe going to the store is a good idea'
-    responses = [ref, entails, contradict, neutral]
-    print(evaluator.aggregate(verbose=True))
 

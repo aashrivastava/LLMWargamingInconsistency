@@ -291,17 +291,6 @@ class ChatCreation:
     def move_2(self, chat_hist):
         chat_hist.append({'role': 'user', 'content': self.create_incident2_and_question()})
 
-
-if __name__ == '__main__':
-    x = ChatCreation(ablated_free=True)
-    y = x.move_1()
-    print(y[0]['content'])
-    # print('----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
-    print(y[1]['content'])
-    # print('---------------------')
-    # x.move_2(y)
-    # for chat in y:
-    #     print(chat['content'])
     
 
 
